@@ -22,7 +22,7 @@ Precompiled for **64b 18.04 Ubuntu and Ubuntu-based Linux**. It's also tested on
 - Add the following environment variables in your `~/.bashrc` (**NOTE**: The path below is an example, make sure it matches your particular path) 
 
 ```bash
-export PATH=$PATH:<INSTALL_DIR>/eda-xschem/gnlxa64/bin
+export PATH=$PATH:<INSTALL_DIR>/eda-xschem/glnxa64/bin
 ```
 
 
