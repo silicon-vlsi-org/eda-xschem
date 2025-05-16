@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>GRAPHS</title>
+<link rel="stylesheet" type="text/css" href="xschem_man.css" />
+<style type="text/css">
+/* Local styling goes here */
+p{padding: 15px  30px 10px;}
+
+</style>
+
+</head>
+<body>
+
+<!-- start of slide -->
+<div class="content">   
+<!-- navigation buttons -->
+<a href="scripts.html" class="prev">PREV</a>
+<a href="xschem_man.html" class="home">UP</a>
+<a href="developer_info.html" class="next">NEXT</a>
+ <!-- slide title -->
+ <h1>VIEWING SIMULATION DATA WITH XSCHEM</h1><br>
+ <p>
+  Usually when a spice simulation is done you want to see the results, this is usually accomplished
+  with a waveform viewer. There are few open source viewers, like
+  <a href="https://github.com/StefanSchippers/xschem-gaw">GAW</a>... <br>
+  <img src="graphs02.png"><br>
+  
+  ...Or ngspice internal plotting facilities:<br>
+  <img src="graphs01.png"><br>
+  There is also an interesting commercial product from Analog Flavor, called
+  <a href="https://www.analogflavor.com/en/bespice/">BeSpice (bspwave)</a>
+  that offers a free of charge one year evaluation license for non commercial use:<br>
+  <img src="graphs03.png"><br>
+  All these waveform viewers are supported by xschem and more can be added, just by giving the command line 
+  to start the viewer to xschem in the <kbd>Simulation-&gt; Configure simulators and tools</kbd> dialog:<br>
+  <img src="graphs04.png"><br>
+  For <a href="">gaw</a>
+  and 
+  <a href="https://xschem.sourceforge.io/stefan/xschem_man/video_tutorials/probe_to_bespice.mp4">bespice</a>
+  xschem can automatically send nets to the viewer by clicking a net on the schematic
+  and pressing the <kbd>Alt-G</kbd> key bind or by menu <kbd>Hilight-&gt;Send selected nets/pins to Viewer</kbd>
+  <br>
+  <img src="graphs05.png"><br>
+ </p>
+
+
+
+
+
+ <a id="graphs"><h2>Using XSCHEM's internal graph functions</h2></a>
+ <p>
+  Xschem can now display waveforms by itself in the drawing area. in the Simulation menu there is an entry to
+  add a graph: <kbd>Graph -&gt; Add waveform graph</kbd>. When this menu is pressed a box can be placed in the schematic:
+ </p>
+ <img src="graphs06.png">
+ <p class="important">
+  Xschem graphs are embedded into a rectangle object. Resizing graphs is done in the same way as resizing 
+  a rectangle object. See the <a href="commands.html#resize">related page</a>.
+  To select a graph (to delete it or move it to a different position) click the left mouse button while in the area
+  shown in this picture:
+ </p>
+ <img src="graphs16.png">
+ <p>
+  The next step is loading the simulation data, This is done by menu
+  <kbd>Waves-&gt;Op | Ac | Dc | Tran | Tran | Noise | Sp </kbd>. This command loads  the user selected
+  .raw file produced by a ngspice/Xyce simulation.
+ </p>
+ <p>
+  The raw file is usually located in the simulation/netlisting directory 
+  <kbd>Simulation -&gt;set netlist dir</kbd>.<br>
+  After placing a graph box and loading simulation data a wave can be added. If you place the mouse on the inside
+  of the box, close to the bottom/left/right edges and click the graph will be selected. 
+  You can also select a graph by dragging a selection rectangle all around it.
+  This tells xschem where 
+  new nodes to be plotted will go, in case you have multiple graphs.
+  Then, select a node or a net label, press 'Alt-G', the net will be added to the graph. Here after a
+  list of commands you can perform in a graph to modify the viewport. These commands are active when
+  the mouse is Inside the graph (you will notice the mouse pointer changing from an arrow to a <kbd>+</kbd>).
+ </p>
+ <p class="important">
+  if <kbd>set graph_use_ctrl_key 1</kbd> is set in the <kbd>xschemrc</kbd> file all bind keys shown
+  below will need the <kbd>Control</kbd> key pressed to operate on the graphs. This setting can be used
+  to make it more explicit when the user wants to operate on graphs. Without the <kbd>Control</kbd>
+  key pressed the usual functions on schematic are performed instead of graph functions.<br>
+  Example: the key <kbd>a</kbd> will create a symbol if used in a schematic while it shows a cursor 
+  if done when the mouse pointer is inside a graph. With the <kbd>set graph_use_ctrl_key 1</kbd> option
+  you will need to press <kbd>Control-a</kbd> with the mouse pointer inside a graph to show a cursor.
+ </p>
+ <p>
+  if the mouse is outside the graph the usual Xschem functions will be available to operate on schematics:
+ </p>
+ <ul>
+  <li>Pressing <kbd>f</kbd> with the mouse in the middle of the graph area will do a full X-axis zoom.</li>
+  <li>Pressing <kbd>f</kbd> with the mouse on the left of the Y axis will do a full Y-axis zoom.</li>
+  <li>Pressing <kbd>Left/Right</kbd> or <kbd>Up/Down</kbd> arrow keys while the mouse is inside a graph will
+      move the waveforms to the left/right or zoom in/zoom out respectively.</li>
+  <li>Pressing <kbd>Left/Right</kbd> arrow keys while the mouse is on the left of the Y-axis
+      will zoom in/zoom out in the Y direction.</li>
+  <li>Pressing the <kbd>left</kbd> mouse button while the pointer is in the center of the graph
+      will move the waves left or right following the pointer X movement.</li>
+  <li>Pressing the <kbd>left</kbd> mouse button while the pointer is on the left of the Y-axis
+      will move the waves high or low following the pointer Y movement.</li>
+  <li> pressing <kbd>A</kbd> and/or <kbd>B</kbd> will show a horizontal cursor. 
+       The difference between the <kbd>A</kbd> and the <kbd>B</kbd> cursor is shown.</li>
+  <li> pressing <kbd>a</kbd> and/or <kbd>b</kbd> will show a vertical cursor. 
+       The sweep variable difference between the <kbd>a</kbd> and the <kbd>b</kbd> cursor is shown and
+       the values of all signals at the X position of the <kbd>a</kbd> cursor is shown. </li>
+  <li> Double clicking the <kbd>left</kbd> mouse button with the pointer above a wave label will 
+       allow to change its color.</li>
+  <li> Pressing the <kbd>right</kbd> mouse button with the pointer above a wave label will show it in bold.</li>
+  <li> Double clicking the <kbd>left</kbd> mouse button with the pointer in the middle of the graph will show a 
+       configuration dialog box, where you can change many graph parameters.</li>
+  <li> Pressing the <kbd>right</kbd> mouse button in the graph area and dragging some distance in the X direction 
+       will zoom in the waveforms to that X range.</li>
+  <li> Pressing the <kbd>right</kbd> mouse button to the left of the Y axis and dragging some distance in the Y direction 
+       will zoom in the waveforms to that Y range.</li>
+ </ul>
+ <p>
+  <img src="graphs07.png"><br>
+  The graph configuration dialog box which is shown by <kbd>left</kbd> button double clicking inside the graph, 
+  allows to change many graph attributes, like number of X/Y labels, minor ticks, wave colors, add waves
+  from the list of waves found in the raw file, select the dataset to show in case of multiple sweep simulations
+  and more.<br>
+  <img src="graphs08.png"><br>
+  The text area with the colored wave names is just a text widget. You can manually edit it to add / remove waves, 
+  or you can place the cursor somewhere in the text, select some waves from the listbox on the left, press the 
+  <kbd>Add</kbd> button to have these waves added.
+  If you place the insertion cursor in the middle of a node name in the text area, you can click the color
+  radio buttons on the bottom to change the color. The <kbd>Search</kbd> entry can be used to restrict the list
+  of nodes displayed in the listbox. The Search entry supports regular expression patterns. For example,
+  <kbd>^X</kbd> will match all nodes that begin with <kbd>X</kbd>, <kbd>xm[0-9]\.</kbd> will match all nodes
+  containing xm followed by one digit and a dot.
+ </p>
+
+
+ <h3>Display bus signals</h3>
+ <p>
+  If you have a design where digital signals are present you might want to group some of these to form a
+  bus and display these bundled signals.
+  After placing a graph box and loading the simulation data as explained above, left-double click the graph
+  to show the configuration dialog, check the <kbd>bus</kbd> and <kbd>digital</kbd> check boxes,
+  use the <kbd>Search</kbd> text entry to restrict the list of signals,
+  then select all the signals you want to show as a bus and click the <kbd>Add</kbd> button. Also set the
+  <kbd>Min value</kbd> and the <kbd>Max value</kbd> of the signals in the bus. This information is needed
+  by Xschem to calculate the logic high and logic low thresholds. Currently the logic '1' is set at 80%
+  of the signal min-max range and the logic '0' level is set at 20% of the signal range.
+  After pressing the <kbd>Add</kbd> button a bus is shown in the text area. The first field is a template 
+  <kbd>BUS_NAME</kbd> that you should change to give a meaningful name to the bus. The bus name is separated from
+  the rest of bits by a <kbd>,</kbd> or <kbd>;</kbd> character.<br>
+  <img src="graphs09.png"><br>
+  You will then see your bussed signal in the graph:<br>
+  <img src="graphs10.png"><br>
+  If you have bussed signals in the schematic , like <kbd>LDA[12:0]</kbd> and your graph has the 
+  <kbd>Digital</kbd> and <kbd>Bus</kbd> checkboxes set you can simply add the LDA bus to the graph by 
+  clicking the net in the schematic (with the configuration dialog open) and pressing <kbd>Alt-G</kbd>:<br>
+  <img src="graphs11.png"><br>
+  You can add many signals to see them stacked in a very compact view:<br>
+  <img src="graphs12.png"><br>
+  It is possible to switch the graph to analog mode, by unchecking the <kbd>Digital</kbd> checkbox in the graph
+  configuration dialog, to better see the waveforms. Switching back to Digital yields the previous view.
+  In analog mode buses are not shown, but are not lost. You will see them again when switching back to
+  Digital mode. <br>
+  <img src="graphs13.png"><br>
+  Many graphs can be created in a schematic, and the configuration of all graphs (viewport, list of signals,
+  colors) is saved together with the schematic. If you re-run a simulation just unloading/loading the data from
+  the simulation menu will update the waveforms.<br>
+  <img src="graphs14.png"><br>
+ <h3>Expression evaluation on waves</h3>
+ <p>
+  It is possible to enter math expressions combining simulation data, for example multiply current and
+  voltage to get the power. The syntax of expressions uses postfix (RPN) notation. When entering an expression
+  use double quotes in the graph edit attribute dialog box, so the expression will be considered as a single 
+  new wave to display. Operands are loaded onto a stack like structure and then evaluated.
+  The syntax is: <br>
+  <kbd>"alias_name;operand operand operator ..."</kbd><br>
+  Example:<br>
+  <kbd>"supply power;i(vcurrvnn) vnn * i(vcurrvpp) vpp * +"</kbd><br>
+  that means: i(vcurrvnn) * vnn +  i(vcurrvpp) * vpp.<br>
+  <kbd>"i(vcurrvnn) 1e6 *"</kbd><br>
+  that means: i(vcurrvnn) * 1e6.<br>
+  <img src="graphs15.png"><br>
+  The optional <kbd>alias_name</kbd> is just a string to display as the wave label instead of the whole expression.
+  The following operators are defined:<br>
+  3 argument operators: 
+ </p>
+  <ul>
+  <li><kbd>?</kbd> Conditional expression: X cond Y ? --&gt; return X if cond = 1 else Y</li>
+  </ul>
+ <p>
+  2 argument operators: 
+ </p>
+  <ul>
+  <li><kbd>+</kbd> Addition</li>
+  <li><kbd>-</kbd> Subtraction</li>
+  <li><kbd>*</kbd> Multiplication</li>
+  <li><kbd>/</kbd> Division</li>
+  <li><kbd>&lt;</kbd> Lower than</li>
+  <li><kbd>&gt;</kbd> Greater than</li>
+  <li><kbd>==</kbd> Equal</li>
+  <li><kbd>!=</kbd> Not equal</li>
+  <li><kbd>&lt;=</kbd> Lower or equal</li>
+  <li><kbd>&gt;=</kbd> Greater or equal</li>
+  <li><kbd>==</kbd> Equal</li>
+  <li><kbd>==</kbd> Equal</li>
+  <li><kbd>**</kbd> Exponentiation</li>
+  <li><kbd>max()</kbd> Take the maximum of the two operators</li>
+  <li><kbd>min()</kbd> Take the minimum of the two operators</li>
+  <li><kbd>exch()</kbd> Exchange top 2 operands on stack</li>
+  <li><kbd>ravg()</kbd> Running average of over a specified time window</li>
+  <li><kbd>del()</kbd> Delete waveform by specified quantity on the X-axis</li>
+  <li><kbd>re()</kbd> Return real part of complex number specified as magnitude and phase (in deg)</li>
+  <li><kbd>im()</kbd> Return imaginary part of complex number specified as magnitude and phase (in deg)</li>
+  </ul>
+  <p>1 argument operators:</p>
+  <ul>
+  <li><kbd>sin()</kbd> Trig. sin function</li>
+  <li><kbd>cos()</kbd> Trig. cos function</li>
+  <li><kbd>tan()</kbd> Trig. tan function</li>
+  <li><kbd>sinh()</kbd> Hyp. sin function</li>
+  <li><kbd>cosh()</kbd> Hyp. cos function</li>
+  <li><kbd>tanh()</kbd> Hyp. tan function</li>
+  <li><kbd>asinh()</kbd> Inv hyp. sin function</li>
+  <li><kbd>acosh()</kbd> Inv hyp. cos function</li>
+  <li><kbd>atanh()</kbd> Inv hyp. tan function</li>
+  <li><kbd>asin()</kbd> Inverse trig. sin function</li>
+  <li><kbd>acos()</kbd> Inverse trig. cos function</li>
+  <li><kbd>atan()</kbd> Inverse trig. tan function</li>
+  <li><kbd>cph()</kbd> Continuous phase. Instead of [-180, +180] discontinuities make phase continuous</li>
+  <li><kbd>sqrt()</kbd> Square root</li>
+  <li><kbd>sgn()</kbd> Sign</li>
+  <li><kbd>abs()</kbd> Absolute value</li>
+  <li><kbd>exp()</kbd> Base-e Exponentiation</li>
+  <li><kbd>ln()</kbd> Base-e logarithm</li>
+  <li><kbd>log10()</kbd> Base 10 logarithm</li>
+  <li><kbd>idx()</kbd> point number (0, 1, 2, ...) in vector</li>
+  <li><kbd>db20()</kbd> Value in deciBel (20 * log10(n))</li>
+  <li><kbd>avg()</kbd> Average</li>
+  <li><kbd>prev()</kbd> Delay waveform by one point (at any x-axis position take the previous value)</li>
+  <li><kbd>deriv()</kbd> Derivative w.r.t. graph sweep variable</li>
+  <li><kbd>deriv0()</kbd> Derivative w.r.t. simulation (index 0) sweep variable</li>
+  <li><kbd>integ()</kbd> Integration</li>
+  <li><kbd>dup()</kbd> Duplicate last element on stack</li>
+  </ul>
+
+
+ <h3>Display a specific dataset for a node</h3>
+ <p>
+The following syntax:
+<kbd>node%n</kbd> where <kbd>node</kbd> is a saved node or a bus or an expression
+  and <kbd>n</kbd> is an integer number will plot only the indicated dataset number.
+  Dataset numbers start from 0.
+  This syntax is accepted for single nodes, bus names and expressions:<br><br>
+  <kbd>"DATA_4; en, cal, saout % 4"</kbd><br>
+  <kbd>saout%3</kbd><br>
+  <kbd>"Power dataset 6; I(VVCC) VCC * %6"</kbd><br><br>
+  <img src="graphs17.png"><br>
+ </p>
+
+
+ <h3>Specify a different raw file in a graph</h3>
+ <p>
+  It is now possible (xschem 3.4.5+) to load more raw files for a schematic in xschem.<br>
+  Each graph may optionally refer to a different raw file. 
+  If you double click on a graph while waveforms are loaded you see the graphdialog dialog box:<br>
+  <img src="graphs18.png"><br>
+  The dialog box has now a simulation type listbox and a <kbd>Raw file:</kbd> text entry box.
+  Specifying an existing .raw file name and a simulation type from the listbox 
+  will override the 'base' raw file loaded in xschem.
+  (the 'base' raw file is the only one that was loaded previously and applied to all graphs)
+  If no raw file is specified in a graph it will use the loaded 'base' raw file if any, like 
+  it used to work before.
+  It is also possible to have multiple graphs all referring to the same raw file, each graph 
+  showing a different simulation. It is for example possible to show a dc, tran, ac simulation all
+  loaded from a common .raw file.
+  Image below shows an example: DC, AC, Transient simulation each one done with 3 runs
+  varying the Bias current. In addition the <kbd>xschem annotate_op</kbd> is also used to 
+  annotate the operating point into the schematic.
+  Ctrl-Left-button-clicking the <kbd>Backannotate</kbd> launcher will instantly update
+  all graphs with data taken from the updated raw file(s).
+  <br>
+  <img src="graphs19.png"><br>
+ </p>
+
+ <h3>Specify a different raw file for a single signal in a graph</h3>
+ <p>
+  The general syntax for a signal in a graph is the following:<br>
+  <kbd>"alias_name; signal_name % dataset# raw_file sim_type</kbd><br>
+   where:<br>
+   <kbd>dataset#</kbd> is the dataset index to display (only meaningful and needed
+   if multiple datasets are present like in Montecarlo / Mismatch simulations).
+   If empty or -1 then show all datasets.<br>
+   <kbd>raw_file</kbd> is the location and name of the raw file to load. You can use 
+   <kbd>$netlist_dir</kbd> to quickly reference the simulation directory where usually such
+   raw files are located.<br>
+   <kbd>sim_type</kbd> is the simulation type, like
+   <kbd>ac</kbd>, <kbd>sp</kbd>, <kbd>spectrum</kbd>, <kbd>dc</kbd>, <kbd>op</kbd>,
+   <kbd>tran</kbd>, <kbd>noise</kbd>.<br>
+  Example:<br>
+  <kbd>"SAOUT; saout % 2 $netlist_dir/autozero_comp.raw tran</kbd><br>
+  <br>
+  <img src="graphs20.png"><br>
+ </p>
+
+ <h3>Change sweep variable</h3>
+ <p> The graph dialog box has a <kbd>Sweep</kbd> textbox where you can write the 
+  X-axis variable. By default xschem uses the first variable in the raw file for the X-axis, and this is the 
+  sweep variable the simulation was done, so time for transients, frequency for AC sims, voltage or current sweep
+  for DC sims. Example below shows a cmos latch where a DC simulation has been done sweeping the voltage generator
+  on the <kbd>a</kbd> input from 0 to 3V.<br>
+  <img src="graphs21.png"><br><br>
+  If <kbd>v(a) v(z)</kbd> is specified in the Sweep textbox (or <kbd>a z</kbd>) the <kbd>z</kbd> signal
+  will be plotted vs <kbd>a</kbd> and the <kbd>a</kbd> signal will be plotted vs <kbd>z</kbd>.<br>
+  <img src="graphs22.png"><br><br>
+  </p>
+
+ <!-- end of slide -->
+ <div class="filler"></div>
+</div>
+
+<!-- frame footer -->
+<iframe seamless src="xschem_footer.html"  class="footer_iframe" >
+</body>
+</html>
+

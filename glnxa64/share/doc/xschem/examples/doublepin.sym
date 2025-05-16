@@ -1,0 +1,89 @@
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+G {}
+K {type=subcircuit
+format="@name @@A[3:0] @@B @@CK @@RST @@Z @symname"
+template="name=x1"
+}
+V {}
+S {}
+E {}
+L 4 -130 -60 130 -60 {}
+L 4 -130 60 130 60 {}
+L 4 -130 -60 -130 60 {}
+L 4 130 -60 130 60 {}
+L 4 130 -10 150 -10 {}
+L 4 -150 -10 -130 -10 {}
+L 4 -150 10 -130 10 {}
+L 4 -150 -30 -130 -30 {}
+L 4 130 -30 150 -30 {}
+L 4 -150 -50 -130 -50 {}
+L 4 130 -50 150 -50 {}
+L 4 130 10 150 10 {}
+L 4 130 50 150 50 {}
+L 4 -140 -55 -135 -50 {}
+L 4 -140 -45 -135 -50 {}
+L 4 -140 -35 -135 -30 {}
+L 4 -140 -25 -135 -30 {}
+L 4 -140 -15 -135 -10 {}
+L 4 -140 -5 -135 -10 {}
+L 4 -140 5 -135 10 {}
+L 4 -140 15 -135 10 {}
+L 4 135 -50 140 -55 {}
+L 4 135 -50 140 -45 {}
+L 4 135 -30 140 -35 {}
+L 4 135 -30 140 -25 {}
+L 4 135 -10 140 -15 {}
+L 4 135 -10 140 -5 {}
+L 4 135 10 140 5 {}
+L 4 135 10 140 15 {}
+L 4 135 45 140 50 {}
+L 4 135 55 140 50 {}
+B 5 -152.5 -12.5 -147.5 -7.5 {name=A[3:0] dir=in }
+B 5 -152.5 7.5 -147.5 12.5 {name=B dir=in }
+B 5 147.5 47.5 152.5 52.5 {name=Z dir=out }
+B 5 147.5 -12.5 152.5 -7.5 {name=A[3:0] dir=in }
+B 5 -152.5 -32.5 -147.5 -27.5 {name=CK dir=in }
+B 5 147.5 -32.5 152.5 -27.5 {name=CK dir=in }
+B 5 -152.5 -52.5 -147.5 -47.5 {name=RST dir=in }
+B 5 147.5 -52.5 152.5 -47.5 {name=RST dir=in }
+B 5 147.5 7.5 152.5 12.5 {name=B dir=in }
+T {@symname} -58.5 -6 0 0 0.3 0.3 {}
+T {@name} 105 -72 0 0 0.2 0.2 {}
+T {A[3:0]} 125 -14 0 1 0.2 0.2 {}
+T {A[3:0]} -125 -14 0 0 0.2 0.2 {}
+T {Z} 125 46 0 1 0.2 0.2 {}
+T {B} -125 6 0 0 0.2 0.2 {}
+T {CK} -125 -34 0 0 0.2 0.2 {}
+T {CK} 125 -34 0 1 0.2 0.2 {}
+T {RST} -125 -54 0 0 0.2 0.2 {}
+T {RST} 125 -54 0 1 0.2 0.2 {}
+T {B} 125 6 0 1 0.2 0.2 {}
+T {@#6:net_name} -127.5 -61.25 0 0 0.15 0.15 {layer=15}
+T {@#4:net_name} -127.5 -41.25 0 0 0.15 0.15 {layer=15}
+T {@#0:net_name} -127.5 -21.25 0 0 0.15 0.15 {layer=15}
+T {@#1:net_name} -127.5 -1.25 0 0 0.15 0.15 {layer=15}
+T {@#7:net_name} 127.5 -61.25 0 1 0.15 0.15 {layer=15}
+T {@#5:net_name} 127.5 -41.25 0 1 0.15 0.15 {layer=15}
+T {@#3:net_name} 127.5 -21.25 0 1 0.15 0.15 {layer=15}
+T {@#8:net_name} 127.5 -1.25 0 1 0.15 0.15 {layer=15}
+T {@#2:net_name} 127.5 38.75 0 1 0.15 0.15 {layer=15}

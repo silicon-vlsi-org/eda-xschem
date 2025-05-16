@@ -1,0 +1,46 @@
+v {xschem version=3.4.5 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname area=@area isc=@isc n=@n rs=@rs rp=@rp m=@m"
+
+
+
+template="name=X1 isc=6 area=1 n=36 rs=0.002 rp=40 m=1"}
+V {}
+S {}
+E {}
+L 4 0 5 0 30 {}
+L 4 0 -30 0 -5 {}
+L 4 -15 5 15 5 {}
+L 4 -15 -20 -5 -20 {}
+L 4 -10 -25 -10 -15 {}
+B 5 -2.5 -32.5 2.5 -27.5 {name=plus dir=inout}
+B 5 -2.5 27.5 2.5 32.5 {name=minus dir=inout}
+B 5 -42.5 -2.5 -37.5 2.5 {name=fade dir=in}
+P 4 7 -35 -30 -25 -20 -20 -25 -15 -10 -30 -15 -25 -20 -35 -30 {}
+P 4 7 -35 -5 -25 5 -20 0 -15 15 -30 10 -25 5 -35 -5 {}
+P 4 4 -0 5 -10 -5 10 -5 -0 5 {}
+T {@name} 15 -28.75 0 0 0.2 0.2 {}
+T {isc=@isc
+n = @n} 30 -10 0 0 0.2 0.2 {}
+T {m=@m} -5 16.25 0 1 0.2 0.2 {}
