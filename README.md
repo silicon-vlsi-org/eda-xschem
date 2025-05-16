@@ -27,6 +27,26 @@ export  PATH=$PATH:$XSCHEM_HOME/bin
 
 ## Quick Start Guide
 - User Manual/Tutorials: [ [PDF](doc/XSCHEM_2.9.2_Manual_Tutorials.pdf) | [HTML](glnxa64/share/doc/xschem/index.html) | [MAN](glnxa64/share/man/man1/xschem.1) ]
+- Create a file `xschemrc` in the work directory (say `~/work/xschem`) with the following `tcl` initilizations:
+
+```tcl
+set PDK_ROOT "$env(HOME)/share/pdk/"  ;# Default open_pdks location
+set PDK "sky130A"
+append XSCHEM_LIBRARY_PATH ":${PDK_ROOT}/${PDK}/libs.tech/xschem"
+source $PDK_ROOT/$PDK/libs.tech/xschem/xschemrc
+```
+
+- Start `xschem` from the work directory
+- xschem should start with a SKY130 schematic with the lots of examples and working schematic.
+- Choose a test circuit eg. `test_inv`
+- Generate a netlist by clicking the `Netlist` button.
+- The netlist is created in the default driectory `~/.xschem/simulations`
+- If you are using the SKY130 PDK, create `~/.xschem/simulations/.spiceinit` with the following content to speed up the simulation:
+
+```bash
+set ngbehavior=hsa
+set ng_nomodcheck
+```
 
 
 * * *
