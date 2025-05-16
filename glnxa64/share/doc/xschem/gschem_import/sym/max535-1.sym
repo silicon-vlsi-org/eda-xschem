@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MAX535
-template="device=MAX535
-name=U?
-footprint=uMAX8
-description=\\"low-power, serial 13-bit voltage-output DAC \\"
-numslots=0
-documentation=http://pdfserv.maxim-ic.com/en/ds/MAX535-MAX5351.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MAX535
+template="device=MAX535 name=U? footprint=uMAX8 description=\\"low-power, serial 13-bit voltage-output DAC \\" numslots=0 documentation=http://pdfserv.maxim-ic.com/en/ds/MAX535-MAX5351.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -14,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}
@@ -78,7 +73,7 @@ L 3 0 -120 30 -120 {}
 B 5 -2.5 -122.5 2.5 -117.5 {pinnumber=4
 pinseq=4
 name=SCLK
-dir=inout
+dir=in
 }
 T {@#3:pinnumber} 20 -125 2 0 0.266667 0.266667 {layer=13}
 T {@#3:name} 35 -120 2 1 0.266667 0.266667 {}
@@ -105,7 +100,7 @@ name=GND
 dir=inout
 }
 T {@#6:pinnumber} 115 -10 2 1 0.266667 0.266667 {layer=13}
-T {@#6:name} 96.4 -35 2 1 0.266667 0.266667 {}
+T {@#6:name} 110 -35 2 1 0.266667 0.266667 { hcenter=true}
 L 3 110 -200 110 -170 {}
 B 5 107.5 -202.5 112.5 -197.5 {pinnumber=8
 pinseq=8
@@ -113,4 +108,4 @@ name=Vcc
 dir=inout
 }
 T {@#7:pinnumber} 115 -180 2 1 0.266667 0.266667 {layer=13}
-T {@#7:name} 96.4 -165 0 0 0.266667 0.266667 {}
+T {@#7:name} 110 -165 0 0 0.266667 0.266667 { hcenter=true}

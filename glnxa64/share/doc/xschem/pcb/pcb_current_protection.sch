@@ -1,9 +1,69 @@
-v {xschem version=2.9.8 file_version=1.2}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
 K {}
 V {}
 S {}
 E {}
+B 2 10 -900 810 -500 {flags=graph
+y1=2.3e-06
+y2=5.1
+ypos1=0
+ypos2=2
+divy=5
+subdivy=1
+unity=1
+x1=-0.00212084
+x2=0.0379531
+divx=5
+subdivx=1
+node="vssload
+vref"
+color="4 8"
+dataset=-1
+unitx=1
+logx=0
+logy=0
+}
+B 2 10 -1300 810 -900 {flags=graph
+y1=-3.6e-05
+y2=0.066
+ypos1=0
+ypos2=2
+divy=5
+subdivy=1
+unity=1
+x1=-0.00212084
+x2=0.0379531
+divx=5
+subdivx=1
+
+
+dataset=-1
+unitx=1
+logx=0
+logy=0
+color=4
+node=i(vmeasure)}
 N 360 -200 360 -190 {lab=VREF}
 N 360 -130 360 -110 {lab=VSS}
 N 360 -260 360 -200 {lab=VREF}
@@ -39,8 +99,11 @@ vrst rst 0 pwl 0 5 100u 5 101u 0
 ** referenced file in netlist/simulation directory.
 .include \\"models_pcb_current_protection.txt\\"
 * .dc RLOAD 10K 1 -0.001
-.tran 10u 200m
-.save all
+.control
+  save all
+  tran 10u 200m
+  write pcb_current_protection.raw
+.endc
 "}
 C {title.sym} 160 -30 0 0 {name=l2 author="Stefan"}
 C {lab_pin.sym} 90 -280 0 1 {name=p8 lab=VCC}
@@ -81,3 +144,7 @@ url="http://html.alldatasheet.com/html-pdf/17919/PHILIPS/MMBT2222/499/2/MMBT2222
 C {gnd.sym} 810 -170 0 0 {name=l11 lab=VSS}
 C {res.sym} 810 -280 2 0 {name=R1 m=1 value=20k footprint=1206}
 C {vdd.sym} 810 -310 0 0 {name=l13 lab=VCC}
+C {launcher.sym} 340 -460 0 0 {name=h5
+descr="load waves" 
+tclcommand="xschem raw_read $netlist_dir/pcb_current_protection.raw tran"
+}

@@ -25,6 +25,24 @@ p{padding: 15px  30px 10px;}
   are the most effective way to build and arrange schematics, so you should learn at least the 
   most important ones.
  </p>
+
+ <h2> INTUITIVE INTERFACE </h2>
+ <p> This is a recent interface that uses less keyboard commands and more mouse actions
+  It is therefore possible to click and drag objects directly and do many more actions
+  by just using mouse actions. This interface is enabled by enabling the menu checkbutton:<br>
+  <kbd>Options -&gt; Intuitive click &amp; Drag Interface</kbd><br>
+  Or by adding the following line:<br>
+ <kbd>set intuitive_interface 1</kbd><br>
+  in your <kbd>xschemrc</kbd> file.
+ </p>
+ <p> The following cheatsheet image shows the intuitive_interface commands</p>
+ <img src="intuitive_interface_cheatsheet.svg">
+ <p> 
+  The standard interface is described below. All below description applies also if
+  intuitive_interface is enabled.
+ </p>
+
+ <h2> STANDARD INTERFACE </h2>
  <p>
   The basic principle in XSCHEM is that first you select something in the circuit then you
   decide what to do with the selection.
@@ -33,12 +51,12 @@ p{padding: 15px  30px 10px;}
   It you need to move together multiple objects you select them (by area or using multiple mouse
   clicks with the <kbd>Shift</kbd> key), then you press the move (<kbd>'m'</kbd>) key.
  </p>
+
  <h3> EDITOR COMMAND CHEATSHEET</h3>
  <p>
   This list is available in XSCHEM in the <kbd>Help</kbd> menu
  </p>
  <pre class="code" style="height: 600px;">
-
                         XSCHEM MOUSE BINDINGS
 ----------------------------------------------------------------------
 LeftButton              Clear selection and select a graphic object 
@@ -52,20 +70,31 @@ ctrl + LeftButton       if an 'url' or 'tclcommand' property is defined on
                         tclcommand
 
 LeftButton drag         Select objects by area, clearing previous selection
-
-shift + LeftButton drag Select objects by area, without clearing 
-                        previous selection
+                        "[shift] left button drag" and "[shift] ctrl-left
+                        button drag" commands are swapped if enable_stretch
+                        is set.
 
 Ctrl + LeftButton drag  Select objects by area to perform a 
                         subsequent   'stretch'  move operation
 
+shift + LeftButton drag Select objects by area, without clearing 
+                        previous selection
+
 Shift +                 Select objects by area without unselecting
 Ctrl + LeftButton drag  to perform a subsequent   'stretch'  move operation
 
-Shift + Right Button    Select all connected wires/labels/pins
+Shift + RightButton     Select all connected wires/labels/pins
 
-Ctrl + Right Button     Select all connected wires/labels/pins, stopping at 
+Ctrl + RightButton      Select all connected wires/labels/pins, stopping at 
                         wire junctions
+
+Alt + RightButton       Cut wire at mouse position (creates 2 adjacent wires)
+                        aligns the cut point to current snap setting.
+
+Alt + Shift + RightButton
+                        Cut wire at mouse position (creates 2 adjacent wires)
+                        does not align cut point to current snap setting.
+
 
 Mouse Wheel             Zoom in / out
 
@@ -76,14 +105,12 @@ Alt + LeftButton        Unselect selected object
 Alt + LeftButton drag  
                         Unselect objects by area
 
-RightButton             Edit property of object under the mouse
-                        else edit global schematic / symbol property string
+RightButton drag        Zoom area
 
-Shift + RightButton     Edit property of object under the mouse 
-                        else edit global schematic / symbol property string
-                        using the specified (or default) text editor.
+RightButton Release     Context menu
 
 LeftButton Double click Terminate Polygon placement
+                        Edit object attributes
 
 
                         XSCHEM KEY BINDINGS
@@ -91,45 +118,60 @@ LeftButton Double click Terminate Polygon placement
 -          BackSpace    Back to parent schematic
 -          Delete       Delete selected objects
 -          Insert       Insert element from library
--          Down         Move down
-ctrl       Enter        Confirm closing dialog boxes
+shift      Insert       Open persistent insert symbol dialog box
+-          Print Scrn   Grab screen area
 -          Escape       Abort, redraw, unselect
+ctrl       Enter        Confirm closing dialog boxes
+-          Down         Move down
 -          Left         Move right
 -          Right        Move left
 -          Up           Move up
+ctrl       Left         Previous tab (if tabbed interface enabled) 
+ctrl       Right        Next tab (if tabbed interface enabled)
+-           ':'         Toggle flat netlist
+-           '\'         Toggle fullscreen
 -           '!'         Break selected wires at any wire or component pin
                         connection
+shift       '&lt;'         Show all layers
+shift       '&gt;'         Show only current set layer
+-           '/'         Show fullscreen image of bindkeys
 -           ' '         Pan schematic
 -           ' '         When drawing lines or wires toggle between 
                         manhattan H-V, manhattan V-H or oblique path.
 -           '#'         Highlight components with duplicated name (refdes)
 ctrl        '#'         Rename components with duplicated name (refdes)
 -           '5'         View only probes
-ctrl        '0-9'       set current layer (4 -13)
+ctrl        '0-9'       set current layer (0-9)
             '0'         set selected net or label to logic value '0'
             '1'         set selected net or label to logic value '1'
             '2'         set selected net or label to logic value 'X'
-            '3'         toggle selected net or label: 1->0, 0->1, X->X
+            '3'         set selected net or label to logic value 'Z'
+            '4'         toggle selected net or label: 1-&gt;0, 0-&gt;1, X-&gt;X
 -           'a'         Make symbol from pin list of current schematic
 ctrl        'a'         Select all
 shift       'A'         Toggle show netlist
 -           'b'         Merge file
+Shift       'B'         Edit/add header/license metadata to the schematic/symbol file.
 ctrl        'b'         Toggle show text in symbol
 alt         'b'         Toggle show symbol details / only bounding boxes
--           'c'         Copy selected obj. 
+-           'c'         Copy selected objects, 'c' and 'alt-c' commands are swapped if enable_stretch is set
+Alt         'c'         Copy selected objects, insert wires when separating touching instance pins/wires
 ctrl        'c'         Save to clipboard
 shift       'C'         Start arc placement
 shift+ctrl  'C'         Start circle placement
-alt         'C'         Toggle dim/brite background with rest of layers
-shift       'D'         Delete files
+ctrl        'd'         Delete files
+-           'd'         Unselect selected object under the mouse pointer
+shift       'D'         Unselect selected objects by area
 ctrl        'e'         Back to parent schematic
 -           'e'         Descend to schematic
+alt+shift   'E'         Edit selected schematic in a new window, new xschem process
 alt         'e'         Edit selected schematic in a new window
             '\'         Toggle Full screen
-shift       'F'         Flip
-alt         'f'         Flip objects around their anchor points
+shift       'F'         Horizontal flip selected objects
+alt         'f'         Horizontal flip selected objects around their anchor points
 ctrl        'f'         Find/select by substring or regexp
 -           'f'         Full zoom
+shift+ctrl  'F'         Zoom full selected elements
 shift       'G'         Double snap factor
 -           'g'         Half snap factor
 ctrl        'g'         Set snap factor
@@ -138,14 +180,15 @@ alt         'g'         Hilight selected nets and send to gaw waveform viewer
 alt         'h'         create symbol pins from schematic pins
 ctrl        'h'         Follow http link or execute command (url, tclcommand properties)
 shift       'H'         Attach net labels to selected instance
--           'i'         Descend to  symbol
+ctrl+shift  'H'         Make schematic and symbol from selected components
+-           'i'         Descend to symbol
+ctrl        'i'         Open persistent insert symbol dialog box
+shift       'I'         Insert symbol
 alt         'i'         Edit selected symbol in a new window
 alt+shift   'J'         Create labels with 'i' prefix from highlighted nets/pins
 alt         'j'         Create labels without 'i' prefix from highlighted nets/pins
 ctrl        'j'         Create ports from highlight nets
 alt+ctrl    'j'         Print list of highlighted nets/pins with label expansion
-shift       'J'         create xplot plot file for ngspice in simulation directory
-                        (just type xplot in ngspice)
 -           'j'         Print list of highlighted nets/pins
 -           'k'         Hilight selected nets
 ctrl+shift  'K'         highlight net passing through elements with 'propag' property set on pins
@@ -153,21 +196,29 @@ shift       'K'         Unhilight all nets
 ctrl        'k'         Unhilight selected nets
 alt         'k'         Select all nets attached to selected wire / label / pin.
 -           'l'         Start line
+shift       'L'         Toggle orthogonal routing (automatic H-V or V-H)
 ctrl        'l'         Make schematic view from selected symbol
 alt+shift   'l'         add lab_wire.sym to schematic
 alt         'l'         add lab_pin.sym to schematic
 ctrl+shift  'o'         Load most recent schematic
 ctrl        'o'         Load schematic
--           'm'         Move selected obj.
-shift       'N'         Hierarchical netlist
--           'n'         Netlist
-ctrl        'n'         New schematic
-ctrl+shift  'N'         New symbol
+-           'm'         Move selected objects. 'm' and 'ctrl-m' commands are swapped if enable_stretch is set
+ctrl        'm'         Move selected objects, stretching wires attached to them
+Alt         'm'         Move selected objects, insert wires when separating touching instance pins/wires
+shift       'M'         Move selected objects, insert wires when separating touching instance pins/wires
+ctrl+shift  'M'         Move selected objects, combine Shift-M and Ctrl-m
+shift       'N'         Top level only netlist
+-           'n'         Hierarchical Netlist
+ctrl        'n'         Clear schematic
+ctrl+shift  'N'         Clear symbol
 shift       'O'         Toggle Light / Dark colorscheme
-ctrl        'o'         Load schematic
+shift+ctrl  'O'         Load most recent file
+ctrl        'o'         Open file
+-           'p'         Place polygon. Operation ends by placing last point over first.
 alt         'p'         Add symbol pin
-ctrl        'p'         Pan schematic view
-shift       'P'         Pan, other way to.
+ctrl        'p'         Add schematic ipin
+ctrl+shift  'P'         Add schematic opin
+shift       'P'         Pan view area
 alt         'q'         Edit schematic file (dangerous!)
 -           'q'         Edit prop
 shift       'Q'         Edit prop with vim
@@ -177,23 +228,31 @@ alt         'r'         Rotate objects around their anchor points
 shift       'R'         Rotate
 -           'r'         Start rect
 shift       'S'         Change element order
-ctrl+shift  'S'         Save  as schematic
+ctrl+shift  'S'         Save as schematic
+-           's'         run simulation (asks confirmation)
 ctrl        's'         Save schematic
 alt         's'         Reload current schematic from disk
 ctrl+alt    's'         Save-as symbol
 -           't'         Place text
+shift       'T'         Toggle *_ignore flag on selected instances
 alt         'u'         Align to current grid selected objects
+ctrl        'u'         Unselect attached floater objects
 shift       'U'         Redo
 -           'u'         Undo
 -           'v'         Constrained vertical move/copy of objects
+shift       'V'         Vertical flip selected objects
+alt         'v'         Vertical flip selected objects around their anchor point
 ctrl        'v'         Paste from clipboard
-shift       'V'         Toggle spice/vhdl/verilog netlist 
+ctrl+shift  'V'         Toggle spice/vhdl/verilog netlist 
 -           'w'         Place wire
-ctrl        'w'         Place polygon. Operation ends by placing last point over first.
+ctrl        'w'         close current schematic
 shift       'W'         Place wire, snapping to closest pin or net endpoint
 ctrl        'x'         Cut into clipboard
 -           'x'         New cad session
 shift       'X'         Highlight discrepancies between object ports and attached nets
+ctrl+shift  'X'         create xplot plot file for ngspice in simulation directory
+                        (just type xplot in ngspice)
+alt         'x'         Toggle draw crosshair at mouse position
 -           'y'         Toggle stretching wires
 -           'z'         Zoom box
 shift       'Z'         Zoom in
@@ -203,21 +262,19 @@ ctrl        'z'         Zoom out
 shift       '*'         Postscript/pdf print
 ctr+shift   '*'         Xpm/png print
 alt+shift   '*'         Svg print
-            '-'         dim colors
-ctrl        '-'         Test mode: change line width
-ctrl        '+'         Test mode: change line width
-            '+'         brite colors
+ctrl        '-'         Decrease line width
+alt         '-'         Set line width
+ctrl        '+'         Increase line width
 -           '_'         Toggle change line width
 -           '%'         Toggle draw grid
 ctrl        '='         Toggle fill rectangles
 -           '$'         Toggle pixmap  saving
 ctrl        '$'         Toggle use XCopyArea vs drawing primitives for drawing the screen
--           ':'         Toggle flat netlist
  </pre><br>
 
  <h3>KEYBIND CUSTOMIZATION</h3>
  <p>
-  changes to default keybindings may be placed in the <kbd>~/.xschem</kbd> file as in the following examples:
+  changes to default keybindings may be placed in the <kbd>~/.xschem/xschemrc</kbd> file as in the following examples:
  </p>
  <pre class="code">
 ## replace Ctrl-d with Escape (so you won't kill the program :-))
@@ -227,7 +284,39 @@ set replace_key(Shift-W) w
 set replace_key(w) Shift-W
  </pre><br>
 
-
+ <a id="select"><h3>SELECT OBJECTS</h3></a>
+ <p>
+  Objects can be selected by clicking the left mouse button when the pointer is very close to the object.
+  For rectangle objects the best point to select it is the internal side, close to one of the corners.
+  More objects can be selected by pressing the <kbd>Shift</kbd> key and clicking another object.
+  Once objects are selected they can be copied (<kbd>c</kbd> key), moved (<kbd>m</kbd> key), deleted
+  (<kbd>Delete</kbd> key) or attributes changed (<kbd>q</kbd> key).<br>
+  Objects can also be selected by area, by dragging with the left mouse button pressed a rectangle around the objects 
+  you want to select.
+ </p>
+ <img src="commands9.png">
+ <a id="resize"><h3>RESIZE OBJECTS</h3></a>
+ <p>
+  All Xschem base objects can be resized.
+  For lines, rectangles, polygons you need to drag the mouse with left button pressed and Ctrl key pressed 
+  over one vertex/endpoint.
+ </p>
+ <img src="commands6.png">
+ <p>
+  After releasing the mouse button the object will become selected
+  and a subsequent move operation (<kbd>m</kbd> key) will move the selected vertex/endpoint.
+ </p>
+ <img src="commands7.png">
+ <p>
+  More objects can be resized. You can add vertex/endpoints by pressing Ctrl and Shift and dragging the mouse 
+  to enclose another vertex/endpoint. After selecting all desired elements pressing the <kbd>m</kbd> key
+  will resize all objects.
+ </p>
+ <img src="commands8.png">
+ <p>
+  Circles can be resized as well. Capture the center of the circle with the above described mouse drag operation, the radius can be changed.
+  For arcs you can capture the center (to modify the radius) or the endpoints to change the start/end angle or the arc angle.
+ </p>
  <h3>STRETCH OPERATIONS</h3>
  <p>
   An important operation that deserves a special paragraph is the <kbd>Stretch</kbd> operation.
@@ -249,7 +338,19 @@ set replace_key(w) Shift-W
  </p>
  <img src="commands3.png">
 
- <h3>PLACE WIRES SNAPPING TO CLOSEST PIN OT NET ENDPOINT</h3>
+ <p> Another way to move objects stretching attached wires is to press <kbd>Ctrl-m</kbd> instead of <kbd>m</kbd>
+     This way you don't have to remember to press <kbd>Ctrl</kbd> when doing the selection.</p>
+
+ <p> Pressing <kbd>Shift-m</kbd> instead of <kbd>m</kbd> will create new wires while moving the selected objects.</p>
+ <img src="commands10.png">
+
+ <h3>PLACE, WIRES MANHATTAN PATHS</h3>
+ <p> When you press the <kbd>w</kbd> key a wire placement begins. Moving the mouse a rubber wire is displayed.
+  Clicking the left mouse button will end the wire placement. If the space bar is pressed you toggle between
+  Horizontal-Vertical, Vertical-Horizontal and oblique placement mode.</p>
+ <img src="commands14.png">
+
+ <h3>PLACE WIRES SNAPPING TO CLOSEST PIN OR NET ENDPOINT</h3>
  <p>
   The (uppercase) <kbd>'W'</kbd> bindkey allows to place a wire putting start (and end point, later) to the 
   closest pin or wire endpoint, this will make it easier to connect precisely without the need to zoom in all times.
@@ -268,6 +369,21 @@ set replace_key(w) Shift-W
  <p style="padding-top:0px;"> <i>
   Unconstrained move: objects follow the mouse pointer in X and Y direction.
  </i></p>
+ <h3>POLYGON EDITING COMMANDS</h3>
+ <p> There are some specific editing modes for polygons. A polygon is created by pressing the <kbd>p</kbd> key.
+  After dragging the first segment a mouse button clock will create the second point and so on.
+  A double click ends the placement.<br>
+  If a polygon is selected the control points are shown with circles. These circles can be dragged with the
+  mouse directly.</p>
+ <img src="commands11.png">
+ <p> Clicking one control point with the <kbd>Shift</kbd> key will add a new point in the polygon shape:</p>
+ <img src="commands12.png">
+ <p> Clicking one control point with the <kbd>Ctrl</kbd> key will delete a point in the polygon shape.</p>
+ <p> Adding attribute <kbd>bezier=true</kbd> or  <kbd>bezier=1</kbd> will transform the polygon into a bezier
+  curve with the polygon points acting as control points.</p>
+ <img src="commands13.png">
+
+
  <!-- end of slide -->
  <div class="filler"></div>
 </div>

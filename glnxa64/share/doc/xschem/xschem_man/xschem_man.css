@@ -22,6 +22,10 @@ html, body{
   background-color: #cccccc;
 }
 
+pre{
+  white-space:pre-wrap;
+}
+
 kbd{
   color: #993333;
   text-align: left;
@@ -188,15 +192,15 @@ h3{
   box-shadow: 10px 10px 9px #48b;
   background: white;
   overflow: auto;
-  width: 90%;
+  width: 96%;
   margin: auto;
   border: groove;
 }
 
 /* mobile rendering  */
-@media all and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)  and (orientation : portrait){ 
+@media all and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 92dpi)  and (orientation : portrait){ 
   * {
-    font-size:20px;
+    font-size:18;
   }
   .prev {
     width: 10%;
@@ -217,9 +221,9 @@ h3{
     left:24%
   }
 }
-@media all and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi)  and (orientation : landscape){ 
+@media all and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 92dpi)  and (orientation : landscape){ 
   * {
-    font-size:25px;
+    font-size:23px;
   }
 
   li{

@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ function beginfile(f)
  print "**** symbol-izing: " sym "  ****"
   template="" ; start=0
   while((getline symline <sym) >0) {
-   if(symline ~ /^[GK] \{/ ) start=1
+   if(symline ~ /^[K] \{/ ) start=1
    if(start) template=template symline "\n"
    if(symline ~ /\} *$/) start=0
   }
@@ -68,8 +68,8 @@ function beginfile(f)
  text_voffset=20
  lab_voffset=4
  ip=op=n_pin=0
- print "v {xschem version=2.9.9 file_version=1.2}" > sym
- if(template=="") {
+ print "v {xschem version=3.4.8RC file_version=1.2}" > sym
+ if(template !~/^{[ \t\n]*$/) {
   printf "%s", "K {type=subcircuit\nformat=\"@name @pinlist @symname\"\n"  >sym
   printf "%s\n", "template=\"name=x1\""  >sym
   printf "%s", "}\n"  >sym
@@ -151,6 +151,8 @@ function rest_of_props()
   sub(/lab[ \t]*=[ \t]*[^ \t]+[ \t]?/, "")
   sub(/value[ \t]*=[ \t]*[^ \t]+[ \t]?/, "")
   sub(/name[ \t]*=[ \t]*[^ \t]+[ \t]?/, "")
+  sub(/^[ \t]*/, " ") # always begin with a space separator
+  sub(/[ \t]*$/, "") # remove trailing white space
   sub(/^[ \t]*$/, "")
   return $0
 }
@@ -234,14 +236,15 @@ function endfile(f) {
  y=-m*space
  x=-width
  print "T {@name}",-x-lwidth+5, y-space/2-8-lab_voffset,0,0,labsize, labsize,"{}" >sym
- print "L 4 " (x+lwidth) ,y-space/2,(-x-lwidth) , y-space/2,"{}" >sym
- print "L 4 " (x+lwidth) ,y+n*space-space/2,(-x-lwidth) , y+n*space-space/2,"{}" >sym
- print "L 4 " (x+lwidth) ,y-space/2,(x+lwidth) , y+n*space-space/2,"{}" >sym
- print "L 4 " (-x-lwidth) ,y-space/2,(-x-lwidth) , y+n*space-space/2,"{}" >sym
 
-
+ print "P 4 5", \
+    (-x-lwidth) ,y-space/2, \
+    (x+lwidth) , y-space/2, \
+    (x+lwidth), y+n*space-space/2, \
+    (-x-lwidth), y+n*space-space/2, \
+    (-x-lwidth) ,y-space/2, \
+    "{}" > sym
  hsort_key(index_pin, y_pin, n_pin)   # 20140519
-
  num_i = num_o = 0 #20140519
 
  for(ii=0;ii<n_pin;ii++)
@@ -259,8 +262,8 @@ function endfile(f) {
   if(dir=="generic")
   {
    printf "B 3 " (x-size) " " (y+num_i*space-size) " " (x+size) " " (y+num_i*space+size) \
-         " {name=" label_pin[i] " generic_type=" sig_type " " >sym
-   if(value !="") printf "value=" value " " >sym
+         " {name=" label_pin[i] " generic_type=" sig_type >sym
+   if(value !="") printf " value=" value >sym
    printf props_pin[i] > sym
    printf "}\n" >sym
    print "L 4 " x,y+num_i*space,x+lwidth, y+num_i*space,"{}" >sym
@@ -270,8 +273,8 @@ function endfile(f) {
   if(dir=="ipin")
   {
    printf "B 5 " (x-size) " " (y+num_i*space-size) " " (x+size) " " (y+num_i*space+size) \
-         " {name=" label_pin[i] vhdt vert " dir=in " >sym
-   if(value !="") printf "value=" value " " >sym
+         " {name=" label_pin[i] vhdt vert " dir=in" >sym
+   if(value !="") printf " value=" value >sym
    printf props_pin[i] > sym
    printf "}\n" >sym
    print "L 4 " x,y+num_i*space,x+lwidth, y+num_i*space,"{}" >sym
@@ -281,8 +284,8 @@ function endfile(f) {
   if(dir=="opin")
   {
    printf "B 5 " (-x-size) " " (y+num_o*space-size) " " (-x+size) " " (y+num_o*space+size) \
-         " {name=" label_pin[i] vhdt vert " dir=out " >sym
-   if(value !="") printf "value=" value " " >sym
+         " {name=" label_pin[i] vhdt vert " dir=out" >sym
+   if(value !="") printf " value=" value >sym
    printf props_pin[i] > sym
    printf "}\n" >sym
    print "L 4 " (-x-lwidth),(y+num_o*space),-x, (y+num_o*space),"{}" >sym
@@ -292,8 +295,8 @@ function endfile(f) {
   if(dir=="iopin")
   {
    printf "B 5 " (-x-size) " " (y+num_o*space-size) " " (-x+size) " " (y+num_o*space+size) \
-         " {name=" label_pin[i] vhdt vert " dir=inout " >sym
-   if(value !="") printf "value=" value " " >sym
+         " {name=" label_pin[i] vhdt vert " dir=inout" >sym
+   if(value !="") printf " value=" value >sym
    printf props_pin[i] > sym
    printf "}\n" >sym
    print "L 7 " (-x-lwidth),(y+num_o*space),-x, (y+num_o*space),"{}" >sym

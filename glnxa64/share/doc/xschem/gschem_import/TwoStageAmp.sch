@@ -1,46 +1,37 @@
-v {xschem version=2.9.7 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {}
 G {}
 V {}
 S {}
 E {}
 T {Two stage amplifier SPICE playpen} 3610 -4680 2 1 0.666667 0.666667 {}
 T {Stuart Brorson -- sdb@cloud9.net} 4000 -4610 2 1 0.333333 0.333333 {}
-N 3250 -4920 3250 -4880 {lab=Vem1}
-N 3350 -4910 3350 -4880 {lab=Vem1}
-N 3790 -5410 3930 -5410 {lab=VColl2 }
-N 4070 -5410 4070 -5310 {lab=Vout}
-N 3790 -5570 3790 -5550 {lab=Vcc}
-N 4100 -5010 4100 -4990 {lab=Vcc}
-N 2750 -4830 2750 -4790 {lab=GND}
-N 2750 -4970 2750 -4950 {lab=Vin}
-N 3150 -4820 3150 -4770 {lab=GND}
-N 3250 -4790 3250 -4770 {lab=GND}
-N 3350 -4790 3350 -4770 {lab=GND}
-N 4070 -5220 4070 -5150 {lab=GND}
-N 4100 -4870 4100 -4850 {lab=GND}
-N 4020 -5410 4130 -5410 {lab=Vout }
-N 2700 -4970 2810 -4970 {lab=Vin }
-N 3100 -4990 3100 -4970 {lab=Vbase1}
-N 3150 -4970 3150 -4910 {lab=Vbase1}
-N 2900 -4970 2940 -4970 {lab=#net1}
-N 3790 -5460 3790 -5360 {lab=VColl2}
-N 3100 -5100 3100 -5080 {lab=Vcc}
-N 3790 -4950 3790 -4920 {lab=GND}
-N 3790 -5260 3790 -5040 {lab=Vem2}
-N 3250 -5350 3250 -5020 {lab=Vcoll1}
-N 3250 -5480 3250 -5440 {lab=Vcc}
-N 3030 -4970 3190 -4970 {lab=Vbase1 }
-N 3900 -4950 3900 -4920 {lab=GND}
-N 3900 -5100 3900 -5040 {lab=Vem2}
-N 3790 -5100 3900 -5100 {lab=Vem2 }
-N 3250 -4910 3350 -4910 {lab=Vem1 }
-N 3590 -5310 3730 -5310 {lab=Vbase2 }
-N 3250 -5310 3330 -5310 {lab=Vcoll1 }
-N 3630 -5160 3630 -5110 {lab=GND}
-N 3630 -5310 3630 -5250 {lab=Vbase2}
-N 3660 -5580 3660 -5560 {lab=Vcc}
-N 3420 -5310 3500 -5310 {lab=#net2}
-N 3660 -5470 3660 -5310 {lab=Vbase2}
+
+
+
+
+
+
 C {transistor.sym} 3190 -4920 0 0 {name=Q1
 model-name=2N3904
 device=NPN_TRANSISTOR
@@ -157,11 +148,49 @@ value=2.2uF
 device=CAPACITOR
 symversion=0.1
 }
-C {lab_wire.sym} 3860 -5410 0 0 {lab=VColl2 }
-C {lab_wire.sym} 4075 -5410 0 0 {lab=Vout }
-C {lab_wire.sym} 2705 -4970 0 0 {lab=Vin }
-C {lab_wire.sym} 3090 -4970 0 0 {lab=Vbase1 }
-C {lab_wire.sym} 3845 -5100 0 0 {lab=Vem2 }
-C {lab_wire.sym} 3300 -4910 0 0 {lab=Vem1 }
-C {lab_wire.sym} 3660 -5310 0 0 {lab=Vbase2 }
-C {lab_wire.sym} 3300 -5310 0 0 {lab=Vcoll1 }
+
+N 3250 -4920 3250 -4880 {}
+N 3350 -4910 3350 -4880 {}
+N 3790 -5410 3930 -5410 {lab=VColl2 }
+C {lab_wire.sym} 3850 -5410 0 1 {lab=VColl2 }
+N 4070 -5410 4070 -5310 {}
+N 3790 -5570 3790 -5550 {}
+N 4100 -5010 4100 -4990 {}
+N 2750 -4830 2750 -4790 {}
+N 2750 -4970 2750 -4950 {}
+N 3150 -4820 3150 -4770 {}
+N 3250 -4790 3250 -4770 {}
+N 3350 -4790 3350 -4770 {}
+N 4070 -5220 4070 -5150 {}
+N 4100 -4870 4100 -4850 {}
+N 4020 -5410 4130 -5410 {lab=Vout }
+C {lab_wire.sym} 4130 -5410 0 1 {lab=Vout }
+N 2700 -4970 2810 -4970 {lab=Vin }
+C {lab_wire.sym} 2700 -4970 0 1 {lab=Vin }
+N 3100 -4990 3100 -4970 {}
+N 3150 -4970 3150 -4910 {}
+N 2900 -4970 2940 -4970 {}
+N 3790 -5460 3790 -5360 {}
+N 3100 -5100 3100 -5080 {}
+N 3790 -4950 3790 -4920 {}
+N 3790 -5260 3790 -5040 {}
+N 3250 -5350 3250 -5020 {}
+N 3250 -5480 3250 -5440 {}
+N 3030 -4970 3190 -4970 {lab=Vbase1 }
+C {lab_wire.sym} 3100 -4970 0 1 {lab=Vbase1 }
+N 3900 -4950 3900 -4920 {}
+N 3900 -5100 3900 -5040 {}
+N 3790 -5100 3900 -5100 {lab=Vem2 }
+C {lab_wire.sym} 3800 -5100 0 1 {lab=Vem2 }
+N 3250 -4910 3350 -4910 {lab=Vem1 }
+C {lab_wire.sym} 3270 -4910 0 1 {lab=Vem1 }
+N 3590 -5310 3730 -5310 {lab=Vbase2 }
+C {lab_wire.sym} 3690 -5310 0 1 {lab=Vbase2 }
+N 3250 -5310 3330 -5310 {lab=Vcoll1 }
+C {lab_wire.sym} 3300 -5310 0 1 {lab=Vcoll1 }
+N 3630 -5160 3630 -5110 {}
+N 3630 -5310 3630 -5250 {}
+N 3660 -5580 3660 -5560 {}
+N 3420 -5310 3500 -5310 {}
+N 3660 -5470 3660 -5310 {}
+

@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MAX4107
-template="device=MAX4107
-name=U?
-footprint=SO8
-description=\\"350MHz, ultra-low-noise opamp\\"
-numslots=0
-documentation=http://pdfserv.maxim-ic.com/en/ds/MAX4106-MAX4107.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MAX4107
+template="device=MAX4107 name=U? footprint=SO8 description=\\"350MHz, ultra-low-noise opamp\\" numslots=0 documentation=http://pdfserv.maxim-ic.com/en/ds/MAX4106-MAX4107.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -14,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

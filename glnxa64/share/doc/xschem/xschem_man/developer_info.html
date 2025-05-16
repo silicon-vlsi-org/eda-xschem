@@ -15,7 +15,7 @@ p{padding: 15px  30px 10px;}
 <!-- start of slide -->
 <div class="content">   
 <!-- navigation buttons -->
-<a href="simulation.html" class="prev">PREV</a>
+<a href="graphs.html" class="prev">PREV</a>
 <a href="xschem_man.html" class="home">UP</a>
 <a href="xschem_remote.html" class="next">NEXT</a>
  <!-- slide title -->
@@ -34,7 +34,7 @@ p{padding: 15px  30px 10px;}
  </ol>
  <p>
   These primitive objects can be drawn on any layer. XSCHEM number of layers can be defined at compile
-  time, however there are some predefiend layers (from 0 to 5) that have specific functions:
+  time, however there are some predefined layers (from 0 to 5) that have specific functions:
  </p>
  <ol start="0">
  <li>Background color</li>
@@ -103,7 +103,7 @@ p{padding: 15px  30px 10px;}
  </p>
  <img src="developer_info_02.png">
  <p>
-  When drawing objecs in XSCHEM coordinates are snapped to a multiple of 10.0 coordinate units,
+  When drawing objects in XSCHEM coordinates are snapped to a multiple of 10.0 coordinate units,
   so all drawn objects are easily aligned.
   The snap level can be changed to any value by the user to allow drawing small objects if desired.
   Grid points are shown at multiples of 20.0 coordinate units, by default.
@@ -147,7 +147,9 @@ p{padding: 15px  30px 10px;}
      <pre class="code">
 C {TECHLIB/PCH} 620 -810 0 0 {name=x5 model=PCHLV w=4 l=0.09  m=1 embed=true}
 [
-G {type=pmos
+v {xschem version=2.9.7 file_version=1.2}
+G {}
+K {type=pmos
 format="@name @pinlist @model w=@w l=@l m=@m"
 verilog_format="@verilog_gate #(@del ) @name ( @@d , @@s , @@g );"
 template=" name=x1 verilog_gate=pmos del=50,50,50 model=PCH w=0.68 l=0.07 m=1 "
@@ -191,11 +193,30 @@ v {xschem version=2.9.7 file_version=1.2}</kbd>
  <p>
   Two attributes are defined, the xschem version and the file format version.
   Current file format version is 1.2. This string is guaranteed to be the first one in XSCHEM .sch and .sym files.
+
+  A comment can be added (by manually editing the xschem schematic or symbol file) as shown below:
  </p>
+ <pre class="code">
+v {xschem version=3.1.0 file_version=1.2 
+* Copyright 2022 Stefan Frederik Schippers
+* 
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     https://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+}
+</pre>
  <h3>GLOBAL SCHEMATIC/SYMBOL PROPERTIES</h3>
  <p>
   Example:<kbd><br>
-G {type=regulator<br>
+K {type=regulator<br>
 format="x@name @pinlist r@symname"<br>
 verilog_format="assign @#2 = @#0 ;"<br>
 tedax_format="footprint @name @footprint<br>
@@ -225,10 +246,22 @@ V {assign #1500 LDOUT = LDIN +1;<br>
 E {}<br>
 S {}</kbd><br>
 in this case only the verilog-related global property has some definition. This is Verilog code that is copied into the output netlist.
-
-
  </p>
- <h3>TEXT OBJECT</h3>
+
+ <p class="important">
+  Attribute strings for all Xschem objects are enclosed in curly braces. 
+  This allows attributes to span multiple lines.
+  This component instance:<br>
+   <kbd>C {capa.sym} 890 -160 0 0 {name=C4 m=1 value=10u device="tantalium capacitor"}</kbd><br>
+  and this one:<br>
+   <kbd>C {capa.sym} 890 -160 0 0 {name=C4<br>
+m=1 value=10u<br>
+device="tantalium capacitor"<br>
+}</kbd><br>
+  are perfectly equivalent.
+ </p>
+
+ <a id="textobj"><h3>TEXT OBJECT</h3></a>
  <p>
   Example: <kbd>T {3 of 4 NANDS of a 74ls00} 500 -580 0 0 0.4 0.4 {font=Monospace layer=4}</kbd><br>
   This line defines a text object, the first field after the type tag is the displayed text,
@@ -244,7 +277,7 @@ in this case only the verilog-related global property has some definition. This 
    with respect to its anchor point.
    <img src="developer_info_03.png"></li>
    <li> text X and Y sizes are stored as floating point numbers.</li>
-   <li> Finally a property string is stored with the same syntax as the displayed text field.
+   <li> Finally a property string is available to attach attributes to the text object.
         Currently the following attributes are predefined for text objects:<br><br>
         <ul>
          <li><kbd>font</kbd> Name of font to be used (ex: font=Arial)</li>
@@ -253,6 +286,10 @@ in this case only the verilog-related global property has some definition. This 
          <li><kbd>vcenter</kbd> If set to <kbd>true</kbd> vertical center text</li>
          <li><kbd>weight</kbd> If set to <kbd>bold</kbd> use bold style</li>
          <li><kbd>slant</kbd> If set to <kbd> italic</kbd> or <kbd>oblique</kbd> use that style for text</li>
+         <li><kbd>hide</kbd> If set to <kbd>true</kbd> text will be hidden unless <kbd>View-&gt;Show hidden texts</kbd>
+           is enabled<br>
+           If <kbd>hide=instance</kbd> is given the text will be invisible in placed instances of the 
+           symbol, but visible when descending into the symbol.</li>
         </ul>
    </li>
   </ul> 
@@ -260,39 +297,67 @@ in this case only the verilog-related global property has some definition. This 
  <h3>WIRE OBJECT</h3>
  <p>
   Example: <kbd>N 890 -130 890 -110 {lab=ANALOG_GND}</kbd><br>
-  The net 'N' tag is followed by the end point coordinates x1,y1 - x2,y2 
+  Format: <kbd>N x1 y1 x2 y2 {attributes}</kbd><br>
+  The net 'N' tag is followed by the end point coordinates x1,y1 - x2,y2.
   (stored and read as double precision numbers) and a property string, used in this case to name the net.
+  In most cases you don't need to specify attributes for nets (one exception is the <kbd>bus</kbd> attribute)
+  as the <kbd>lab</kbd> attribute is set by xschem when creating a netlist or more generally when
+  building the connectivity.
+  This means that almost always nets in a xschem schematic are set as in following example:<br>
+   <kbd>N 890 -130 890 -110 {}</kbd><br>
+  Xschem schematic files store only geometrical data and attributes of the graphic primitives, 
+  the connectivity and the logical network is obtained by xschem. 
  </p>
  <h3>LINE OBJECT</h3>
  <p>
   Example: <kbd>L 4 -50 20 50 20 {This is a line on layer 4}</kbd><br>
+  Format: <kbd>L layer x1 y1 x2 y2 {attributes}</kbd><br>
   The line 'L' tag is followed by an integer specifying the graphic layer
  followed by the x1,y1 - x2,y2 coordinates of the line and a property string.
  </p>
  <h3>RECTANGLE OBJECT</h3>
  <p>
   Example: <kbd>B 5 -62.5 -2.5 -57.5 2.5 {name=IN dir=in pinnumber=1}</kbd><br>
+  Format: <kbd>B layer x1 y1 x2 y2 {attributes}</kbd><br>
   The 'Box' 'B' tag is followed by an integer specifying the graphic layer followed
   by the x1,y1 - x2,y2 coordinates of the rectangle
-  and a final property string. This example defines a symbol pin.
+  and a final property string. This example defines a symbol pin.<br>
+  A <kbd>fill=true</kbd> attribute may be given get a patterned fill (this is the default for rectangles).<br>
+  A <kbd>fill=false</kbd> attribute may be given to avoid a fill pattern.<br>
+  A <kbd>fill=full</kbd> attribute may be given to get a full solid fill.<br>
+  Example: <kbd>B 4 100 -300 400 100 {fill=false}</kbd><br>
  </p>
  <h3>OPEN / CLOSED POLYGON OBJECT</h3>
  <p>
   Example: <kbd>P 3 5 2450 -210 2460 -170 2500 -170 2510 -210 2450 -210 {}</kbd><br>
+  Format: <kbd> P layer npoints px1 py1 px2 py2 .... {attributes}</kbd><br>
   the Polygon 'P' tag is followed by an integer specifying the layer number,
   followed by the number of points (integer), 
   the x,y coordinates of the polygon points and the property string (empty in this example).
   If the last point is coincident to the first point a closed polygon is drawn.
-  A 'fill=true' arribute may be given to fill a cloded polygon, in this case a polygon line looks like:<br>
+  A <kbd>fill=true</kbd> attribute may be given to fill a closed polygon, in this case a polygon line looks like:<br>
   <kbd>P 3 5 2450 -210 2460 -170 2500 -170 2510 -210 2450 -210 {fill=true}</kbd><br>
+  A <kbd>fill=full</kbd> attribute will paint the polygon with a solid full color (instead of a  patterned fill).<br>
+  A <kbd>bezier=true</kbd> attribute will transform the polygon into a bezier curve. See 
+  <a href="commands.html">the editor commands page on polygons.</a>
+ 
+  
  </p>
  <h3>ARC OBJECT</h3>
  <p>
   Example: <kbd>A 3 450 -210 120 45 225 {}</kbd><br>
+  Format: <kbd>A x y r a b {attributes}</kbd><br>
   The Arc 'A' tag is followed by an integer specifying the layer number, followed by the arc x, y center coordinates,
   the arc radius, the start angle (measured counterclockwise from the three o'clock direction), the arc sweep angle
   (measured counterclockwise from the start angle) and the property string (empty in this example).
   Angles are measured in degrees.<br>
+  Arcs can be filled or not:<br>
+  A <kbd>fill=true</kbd> attribute may be given get a patterned fill.<br>
+  A <kbd>fill=false</kbd> attribute may be given to avoid a fill pattern. This is the default<br>
+  A <kbd>fill=full</kbd> attribute may be given to get a full solid fill.<br>
+  Circles are just arcs with a sweep angle of 360 degrees.<br>
+  Example: <kbd>A 4 100 -40 40 0 360 {fill=full}</kbd><br>
+
   <img src="developer_info_07.png">
  </p>
  <h3>COMPONENT INSTANCE</h3>
@@ -310,7 +375,8 @@ in this case only the verilog-related global property has some definition. This 
  </p>
  <h3>EXAMPLE OF A COMPLETE SYMBOL FILE (7805.sym)</h3><br>
  <pre class="code">
-G {type=regulator
+G {}
+K {type=regulator
 format="x@name @pinlist r@symname"
 verilog_format="assign @#2 = @#0 ;"
 tedax_format="footprint @name @footprint
@@ -340,6 +406,7 @@ T {@#2:pinnumber} 47.5 -2.5 0 1 0.12 0.12 {}
  <h3>EXAMPLE OF A COMPLETE SCHEMATIC FILE (pcb_test1.sch)</h3><br>
  <pre class="code">
 G {}
+K {}
 V {}
 S {}
 E {}
@@ -422,6 +489,2126 @@ C {verilog_timescale.sym} 1050 -100 0 0 {name=s1 timestep="1ns" precision="1ns" 
  </pre>
  <img src="developer_info_06.png"><br>
  <br>
+ <h1>XSCHEM <a id="cmdref">COMMAND REFERENCE</a> DOCUMENTATION</h1><br>
+ <p>
+   The following are xschem specific tcl commands.
+   All commands are prefixed by the <kbd>xschem</kbd> keyword.
+   <br>
+   Example:
+ </p>
+ <pre class="code">
+     <strong>xschem</strong> getprop instance x3 OFFSET </pre>
+ <br>
+ <ul> <!-- Following list items generated in xschem src dir with: 
+             ./extract_scheduler_cmd_help.awk scheduler.c > ~/xxx 
+           Include ~/xxx here between <ul> and </ul>
+        -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <li><kbd>       abort_operation</kbd></li><pre>
+   Resets UI state, unselect all and abort any pending operation </pre>
+   <li><kbd>       add_symbol_pin [x y name dir [draw]]</kbd></li><pre>
+   place a symbol pin.
+   x,y : pin coordinates
+   name = pin name
+   dir = in|out|inout
+   draw: 1 | 0 (draw or not the added pin immediately, default = 1)
+   if no parameters given start a GUI placement of a symbol pin </pre>
+   <li><kbd>       add_graph</kbd></li><pre>
+   Start a GUI placement of a graph object </pre>
+   <li><kbd>       add_image</kbd></li><pre>
+   Ask user to choose a png/jpg file and start a GUI placement of the image </pre>
+   <li><kbd>       align</kbd></li><pre>
+   Align currently selected objects to current snap setting </pre>
+   <li><kbd>       annotate_op [raw_file] [level]</kbd></li><pre>
+   Annotate operating point data into current schematic.
+   use &lt;schematic name&gt;.raw or use supplied argument as raw file to open
+   look for operating point data and annotate voltages/currents into schematic.
+   The optional 'level' integer specifies the hierarchy level the raw file refers to.
+   This is necessary if annotate_op is called from a sub schematic at a hierarchy
+   level &gt; 0 but simulation was done at top level (hierarchy 0, for example)</pre>
+   <li><kbd>       arc</kbd></li><pre>
+   Start a GUI placement of an arc.
+   User should click 3 unaligned points to define the arc </pre>
+   <li><kbd>       attach_labels</kbd></li><pre>
+   Attach net labels to selected component(s) instance(s) </pre>
+   <li><kbd>       bbox begin|end</kbd></li><pre>
+   Start/end bounding box calculation: parameter is either 'begin' or 'end' </pre>
+   <li><kbd>       break_wires [remove]</kbd></li><pre>
+   Break wires at selected instance pins
+   if '1' is given as 'remove' parameter broken wires that are
+   all inside selected instances will be deleted </pre>
+   <li><kbd>       build_colors</kbd></li><pre>
+   Rebuild color palette using values of tcl vars dim_value and dim_bg </pre>
+   <li><kbd>       callback win_path event mx my key button aux state</kbd></li><pre>
+   Invoke the callback event dispatcher with a software event </pre>
+   <li><kbd>       case_insensitive 1|0</kbd></li><pre>
+   Set case insensitive symbol lookup. Use only on case insensitive filesystems </pre>
+   <li><kbd>       change_elem_order n</kbd></li><pre>
+   set selected object (instance, wire, line, rect, ...) to
+   position 'n' in its respective array </pre>
+   <li><kbd>       change_sch_path n &lt;draw&gt;</kbd></li><pre>
+   if descended into a vector instance change inst number we are into to 'n',
+   (same rules as 'descend' command) without going up and descending again
+   if 'draw' string is given redraw screen </pre>
+   <li><kbd>       check_symbols</kbd></li><pre>
+   List all used symbols in current schematic and warn if some symbol is newer </pre>
+   <li><kbd>       check_unique_names [1|0]</kbd></li><pre>
+   Check if all instances have a unique refdes (name attribute in xschem),
+   highlight such instances. If second parameter is '1' rename duplicates </pre>
+   <li><kbd>       closest_object</kbd></li><pre>
+   returns index of closest object to mouse coordinates
+   index = type layer n
+   type = wire | text | line | poly | rect | arc | inst
+   layer is the layer number the object is drawn with
+   (valid for line, poly, rect, arc)
+   n is the index of the object in the xschem array
+   example:
+      $  after 3000 {set obj [xschem closest_object]}
+   (after 3s)
+      $ puts $obj
+      line 4 19 </pre>
+   <li><kbd>       circle</kbd></li><pre>
+   Start a GUI placement of a circle.
+   User should click 3 unaligned points to define the circle </pre>
+   <li><kbd>       clear [force] [symbol|schematic]</kbd></li><pre>
+   Clear current schematic window. Resets hierarchy level. Remove symbols
+   the 'force' parameter will not ask to save existing modified schematic.
+   the 'schematic' or 'symbol' parameter specifies to default to a schematic
+   or symbol window (default: schematic) </pre>
+   <li><kbd>       clear_drawing</kbd></li><pre>
+   Clears drawing but does not purge symbols </pre>
+   <li><kbd>       color_dim value</kbd></li><pre>
+   Dim colors or brite colors depending on value parameter: -5 &lt;= value &lt;= 5 </pre>
+   <li><kbd>       compare_schematics [sch_file]</kbd></li><pre>
+   Compare currently loaded schematic with another 'sch_file' schematic.
+   if no file is given prompt user to choose one </pre>
+   <li><kbd>       connected_nets [0|1|2|3]</kbd></li><pre>
+   Select nets/labels  connected to currently selected instance
+   if '1' argument is given, stop at wire junctions
+   if '2' argument is given select only wires directly
+   attached to selected instance/net
+   if '3' argument is given combine '1' and '2' </pre>
+   <li><kbd>       copy</kbd></li><pre>
+   Copy selection to clipboard </pre>
+   <li><kbd>       copy_hierarchy to from</kbd></li><pre>
+   Copy hierarchy info from tab/window "from" to tab/window "to"
+   Example: xschem copy_hierarchy .drw .x1.drw </pre>
+   <li><kbd>       copy_objects [dx dy] [kissing] [stretch]</kbd></li><pre>
+   if kissing is given add nets to pins that touch other instances or nets
+   if stretch is given stretch connected nets to follow instace pins
+   if dx and dy are given copy selection
+   to specified offset, otherwise start a GUI copy operation </pre>
+   <li><kbd>       count_items string separator quoting_chars</kbd></li><pre>
+   Debug command </pre>
+   <li><kbd>       create_plot_cmd</kbd></li><pre>
+   Create an xplot file in netlist/simulation directory with
+   the list of highlighted nodes in a format the selected waveform
+   viewer understands (bespice, gaw, ngspice) </pre>
+   <li><kbd>       cursor n e</kbd></li><pre>
+   enable or disable cursors.
+   cursor will be set at 0.0 position. use 'xschem set cursor[12]_x' to set position
+   n: cursor number (1 or 2, for a or b)
+   e: enable flag: 1: show, 0: hide </pre>
+   <li><kbd>       cut</kbd></li><pre>
+   Cut selection to clipboard </pre>
+   <li><kbd>       debug n</kbd></li><pre>
+   Set xschem in debug mode.'n' is the debug level
+   (0=no debug). Higher levels yield more debug info.</pre>
+   <li><kbd>       delete</kbd></li><pre>
+   Delete selection </pre>
+   <li><kbd>       delete_files</kbd></li><pre>
+   Bring up a file selector the user can use to delete files </pre>
+   <li><kbd>       descend [n] [notitle]</kbd></li><pre>
+   Descend into selected component instance. Optional number 'n' specifies the
+   instance number to descend into for vector instances (default: 0).
+   0 or 1: leftmost instance, 2: second leftmost instance, ...
+  -1: rightmost instance,-2: second rightmost instance, ...
+  if integer 'notitle' is given pass it to descend_schematic() </pre>
+   <li><kbd>       descend_symbol</kbd></li><pre>
+   Descend into the symbol view of selected component instance </pre>
+   <li><kbd>       destroy_all [force]</kbd></li><pre>
+   Close all additional windows/tabs. If 'force' is given do not ask for
+   confirmation for changed schematics
+   Returns the remaining # of windows/tabs in addition to main window/tab </pre>
+   <li><kbd>       display_hilights [nets|instances]</kbd></li><pre>
+   Print a list of highlighted objects (nets, net labels/pins, instances)
+   if 'instances' is specified list only instance highlights
+   if 'nets' is specified list only net highlights </pre>
+   <li><kbd>       draw_graph [n] [flags]</kbd></li><pre>
+   Redraw graph rectangle number 'n'.
+   If the optional 'flags' integer is given it will be used as the
+   flags bitmask to use while drawing (can be used to restrict what to redraw) </pre>
+   <li><kbd>       draw_hilight_net [1|0]</kbd></li><pre>
+   Redraw only hilight colors on nets and instances
+   the parameter specifies if drawing on window or only on back buffer </pre>
+   <li><kbd>       drc_check [i]</kbd></li><pre>
+   Perform DRC rulecheck of instances.
+   if i is specified do check of specified instance
+   otherwise check all instances in current schematic. </pre>
+   <li><kbd>       edit_file</kbd></li><pre>
+   Edit xschem file of current schematic if nothing is selected.
+   Edit .sym file if a component is selected. </pre>
+   <li><kbd>       edit_prop</kbd></li><pre>
+   Edit global schematic/symbol attributes or attributes
+   of currently selected instances </pre>
+   <li><kbd>       edit_vi_prop</kbd></li><pre>
+   Edit global schematic/symbol attributes or
+   attributes of currently selected instances
+   using a text editor (defined in tcl 'editor' variable) </pre>
+   <li><kbd>       embed_rawfile raw_file</kbd></li><pre>
+   Embed base 64 encoded 'raw_file' into currently
+   selected element as a 'spice_data'
+   attribute. </pre>
+   <li><kbd>       enable_layers</kbd></li><pre>
+   Enable/disable layers depending on tcl array variable enable_layer() </pre>
+   <li><kbd>       escape_chars source [charset]</kbd></li><pre>
+   escape tcl special characters with backslash
+   if charset is given escape characters in charset </pre>
+   <li><kbd>       eval_expr str</kbd></li><pre>
+   debug function: evaluate arithmetic expression in str </pre>
+   <li><kbd>       exit [exit_code] [closewindow] [force]</kbd></li><pre>
+   Exit the program, ask for confirm if current file modified.
+   if exit_code is given exit with its value, otherwise use 0 exit code
+   if 'closewindow' is given close the window, otherwise leave with a blank schematic
+   when closing the last remaining window
+   if 'force' is given do not ask before closing modified schematic windows/tabs
+   This command returns the list of remaining open windows in addition to main window </pre>
+   <li><kbd>       expandlabel lab</kbd></li><pre>
+   Expand vectored labels/instance names:
+   xschem expandlabel {2*A[3:0]} --&gt; A[3],A[2],A[1],A[0],A[3],A[2],A[1],A[0] 8
+   last field is the number of bits
+   since [ and ] are TCL special characters argument must be quoted with { and } </pre>
+   <li><kbd>       fill_reset [nodraw]</kbd></li><pre>
+   After setting tcl array pixdata(n) reset fill patterns on all layers
+   If 'nodraw' is given do not redraw window.</pre>
+   <li><kbd>       fill_type n fill_type [nodraw]</kbd></li><pre>
+   Set fill type for layer 'n', fill_type may be 'solid' or 'stipple' or 'empty'
+   If 'nodraw' is given do not redraw window.</pre>
+   <li><kbd>       find_nth string sep quote keep_quote n</kbd></li><pre>
+   Find n-th field string separated by characters in sep. 1st field is in position 1
+   do not split quoted fields (if quote characters are given) and return unquoted.
+   xschem find_nth {aaa,bbb,ccc,ddd} {,} 2  --&gt; bbb
+   xschem find_nth {aaa, "bbb, ccc" , ddd} { ,} {"} 2  --&gt; bbb, ccc</pre>
+   <li><kbd>       flip [x0 y0]</kbd></li><pre>
+   Flip selection horizontally around point x0 y0.
+   if x0, y0 not given use mouse coordinates </pre>
+   <li><kbd>       flip_in_place</kbd></li><pre>
+   Flip selection horizontally, each object around its center </pre>
+   <li><kbd>       flipv [x0 y0]</kbd></li><pre>
+   Flip selection vertically around point x0 y0.
+   if x0, y0 not given use mouse coordinates </pre>
+   <li><kbd>       flipv_in_place</kbd></li><pre>
+   Flip selection vertically, each object around its center </pre>
+   <li><kbd>       floaters_from_selected_inst</kbd></li><pre>
+   flatten to current level selected instance texts </pre>
+   <li><kbd>       fullscreen</kbd></li><pre>
+   Toggle fullscreen modes: fullscreen with menu &amp; status, fullscreen, normal </pre>
+   <li><kbd>       get var</kbd></li><pre>
+   Get C variable/constant 'var' </pre>
+   <ul>
+     <li><kbd> backlayer </kbd> number of background layer </li>
+     <li><kbd> bbox </kbd> bounding box schematic </li>
+     <li><kbd> bbox_hilighted </kbd> bounding box of highlinhted objects </li>
+     <li><kbd> bbox_selected </kbd> bounding box of selected objects </li>
+     <li><kbd> build_date </kbd> time and date this file was built. </li>
+     <li><kbd> cadlayers </kbd> number of layers </li>
+     <li><kbd> case_insensitive </kbd> case_insensitive symbol matching </li>
+     <li><kbd> color_ps </kbd> color postscript flag </li>
+     <li><kbd> constr_mv </kbd> color postscript flag </li>
+     <li><kbd> current_dirname </kbd> directory name of current design </li>
+     <li><kbd> current_name </kbd> name of current design (no library path) </li>
+     <li><kbd> current_win_path </kbd> path of current tab/window (.drw, .x1.drw, ...) </li>
+     <li><kbd> currsch </kbd> hierarchy level of current schematic (start at 0) </li>
+     <li><kbd> cursor1_x </kbd> cursor 1 position </li>
+     <li><kbd> cursor2_x </kbd> cursor 2 position </li>
+     <li><kbd> debug_var </kbd> debug level (0 = no debug, 1, 2, 3,...) </li>
+     <li><kbd> draw_window </kbd> direct draw into window </li>
+     <li><kbd> first_sel </kbd> get data about first selected object </li>
+     <li><kbd> fix_broken_tiled_fill </kbd> get drawing method setting (for broken GPUs) </li>
+     <li><kbd> fix_mouse_coord </kbd> get fix_mouse_coord setting (fix for broken RDP)</li>
+     <li><kbd> format </kbd> alternate format attribute to use in netlist (or NULL) </li>
+     <li><kbd> graph_lastsel </kbd> number of last graph that was clicked </li>
+     <li><kbd> gridlayer </kbd> layer number for grid </li>
+     <li><kbd> help </kbd> command help </li>
+     <li><kbd> header_text </kbd> header metadata (license info etc) present in schematic </li>
+     <li><kbd> infowindow_text </kbd> ERC messages </li>
+     <li><kbd> instances </kbd> number of instances in schematic </li>
+     <li><kbd> intuitive_interface </kbd> ERC messages </li>
+     <li><kbd> last_created_window </kbd> return win_path of last created tab or window </li>
+     <li><kbd> lastsel </kbd> number of selected objects </li>
+     <li><kbd> line_width </kbd> get line width </li>
+     <li><kbd> lines </kbd> (xschem get lines n) number of lines on layer 'n' </li>
+     <li><kbd> modified </kbd> schematic is in modified state (needs a save) </li>
+     <li><kbd> netlist_name </kbd> netlist name if set. If 'fallback' given get default name </li>
+     <li><kbd> netlist_type </kbd> get current netlist type (spice/vhdl/verilog/tedax) </li>
+     <li><kbd> no_draw </kbd> disable drawing </li>
+     <li><kbd> ntabs </kbd> get number of additional tabs (0 = only one tab) </li>
+     <li><kbd> pinlayer </kbd> layer number for pins </li>
+     <li><kbd> raw_level </kbd> hierarchy level where raw file was loaded </li>
+     <li><kbd> rectcolor </kbd> current layer number </li>
+     <li><kbd> rects </kbd> (xschem get rects n) number of rectangles on layer 'n' </li>
+     <li><kbd> sellayer </kbd> layer number for selection </li>
+     <li><kbd> semaphore </kbd> used for debug </li>
+     <li><kbd> schname </kbd> get full path of current sch. if 'n' given get sch of level 'n' </li>
+     <li><kbd> schprop </kbd> get schematic "spice" global attributes </li>
+     <li><kbd> schvhdlprop </kbd> get schematic "vhdl" global attributes </li>
+     <li><kbd> schverilogprop </kbd> get schematic "verilog" global attributes </li>
+     <li><kbd> schsymbolprop </kbd> get schematic "symbol" global attributes </li>
+     <li><kbd> schtedaxprop </kbd> get schematic "tedax" global attributes </li>
+     <li><kbd> sch_path </kbd> get hierarchy path. if 'n' given get hierpath of level 'n' </li>
+     <li><kbd> sch_to_compare </kbd> if set return schematic current design is compared with </li>
+     <li><kbd> sim_sch_path </kbd> get sim hier path. start from level where raw was loaded </li>
+     <li><kbd> symbols </kbd> number of loaded symbols </li>
+     <li><kbd> temp_dir </kbd> get windows temporary dir </li>
+     <li><kbd> text_svg </kbd> return 1 if using &lt;text&gt; elements in svg export </li>
+     <li><kbd> textlayer </kbd> layer number for texts </li>
+     <li><kbd> top_path </kbd> get top hier path of current window (always "" for tabbed if) </li>
+     <li><kbd> topwindow </kbd> same as top_path but main window returned as "." </li>
+     <li><kbd> ui_state </kbd> return UI state </li>
+     <li><kbd> version </kbd> return xschem version </li>
+     <li><kbd> wirelayer </kbd> layer used for wires </li>
+     <li><kbd> wires </kbd> number of wires </li>
+     <li><kbd> xschem_web_dirname </kbd></li>
+     <li><kbd> xorigin </kbd> x coordinate of origin </li>
+     <li><kbd> yorigin </kbd> y coordinate of origin </li>
+     <li><kbd> zoom </kbd> zoom level </li>
+   </ul>
+   <li><kbd>       get_additional_symbols what</kbd></li><pre>
+   create new symbols for instance based implementation selection </pre>
+   <li><kbd>       get_cell cell n_dirs</kbd></li><pre>
+   return result of get_cell function </pre>
+   <li><kbd>       get_cell_w_ext cell n_dirs</kbd></li><pre>
+   return result of get_cell_w_ext function </pre>
+   <li><kbd>       get_fqdevice instname param modelparam</kbd></li><pre>
+   get the full pathname of "instname" device
+   modelparam: 
+     0: current, 1: modelparam, 2: modelvoltage
+   param: device parameter, like ib, gm, vth
+   set param to {} (empty str) for just branch current of 2 terminal device
+   for parameters like "vth" modelparam must be 2
+   for parameters like "ib" modelparam must be 0
+   for parameters like "gm" modelparam must be 1</pre>
+   <li><kbd>       getprop instance|instance_pin|symbol|text ref</kbd></li><pre>
+      
+       getprop instance inst
+   Get the full attribute string of 'inst'
+      
+       getprop instance inst attr
+   Get the value of attribute 'attr'
+   If 'attr has the form 'cell::sym_attr' look up attribute 'sym_attr'
+   of the symbol referenced by the instance.
+      
+       getprop instance_notcl inst attr
+   Same as above but do not perform tcl substitution
+      
+       getprop instance_pin inst pin
+   Get the full attribute string of pin 'pin' of instance 'inst'
+   Example: xschem getprop instance_pin x3 MINUS --&gt; name=MINUS dir=in
+      
+       getprop instance_pin inst pin pin_attr
+   Get attribute 'pin_attr' of pin 'pin' of instance 'inst'
+   Example: xschem getprop instance_pin x3 MINUS dir --&gt; in
+      
+       getprop symbol sym_name
+   Get full attribute string of symbol 'sym_name'
+   example:
+   xschem getprop symbol comp_ngspice.sym --&gt;
+     type=subcircuit
+     format="@name @pinlist @symname
+        OFFSET=@OFFSET AMPLITUDE=@AMPLITUDE GAIN=@GAIN ROUT=@ROUT COUT=@COUT"
+     template="name=x1 OFFSET=0 AMPLITUDE=5 GAIN=100 ROUT=1000 COUT=1p"
+      
+       getprop symbol sym_name sym_attr [with_quotes]
+   Get value of attribute 'sym_attr' of symbol 'sym_name'
+   'with_quotes' (default:0) is an integer passed to get_tok_value()
+      
+       getprop rect layer num attr [with_quotes]
+   if '1' is given as 'keep' return backslashes and unescaped quotes if present in value
+   Get attribute 'attr' of rectangle number 'num' on layer 'layer'
+      
+       getprop text num attr
+   Get attribute 'attr' of text number 'num'
+   if attribute is 'txt_ptr' return the text
+      
+       getprop wire num attr
+   Get attribute 'attr' of wire number 'num'
+      
+       ('inst' can be an instance name or instance number)
+       ('pin' can be a pin name or pin number)</pre>
+   <li><kbd>       get_sch_from_sym inst [symbol]</kbd></li><pre>
+   get schematic associated with instance 'inst'
+   if inst==-1 and a 'symbol' name is given get sch associated with symbol </pre>
+   <li><kbd>       get_tok str tok [with_quotes]</kbd></li><pre>
+   get value of token 'tok' in string 'str'
+   'with_quotes' (default:0) is an integer passed to get_tok_value() </pre>
+   <li><kbd>       get_tok_size</kbd></li><pre>
+   Get length of last looked up attribute name (not its value)
+   if returned value is 0 it means that last searched attribute did not exist </pre>
+   <li><kbd>       globals</kbd></li><pre>
+   Return various global variables used in the program </pre>
+   <li><kbd>       go_back [what]</kbd></li><pre>
+   Go up one level (pop) in hierarchy
+   if integer 'what' given pass it to the go_back() function
+   what = 1: ask confirm save if current schematic modified.
+   what = 2: do not reset window title </pre>
+   <li><kbd>       grabscreen</kbd></li><pre>
+   grab root window </pre>
+   <li><kbd>       hash_file file [skip_path_lines]</kbd></li><pre>
+   Do a simple hash of 'file'
+   'skip_path_lines' is an integer (default: 0) passed to hash_file() </pre>
+   <li><kbd>       hash_string str</kbd></li><pre>
+   Do a simple hashing of string 'str' </pre>
+   <li><kbd>       help</kbd></li><pre>
+  Print command help </pre>
+   <li><kbd>       hier_psprint [file]</kbd></li><pre>
+   Hierarchical postscript / pdf print
+   if 'file' is not given show a fileselector dialog box </pre>
+   <li><kbd>       hilight [drill]</kbd></li><pre>
+   Highlight selected element/pins/labels/nets
+   if 'drill' is given propagate net highlights through conducting elements
+   (elements that have the 'propag' attribute on pins ) </pre>
+   <li><kbd>       hilight_instname [-fast] inst</kbd></li><pre>
+   Highlight instance 'inst'
+       if '-fast' is specified do not redraw
+   'inst' can be an instance name or number </pre>
+   <li><kbd>       hilight_netname [-fast] net </kbd></li><pre>
+   Highlight net name 'net'
+   if '-fast' is given do not redraw hilights after operation </pre>
+   <li><kbd>       image [invert|white_transp|black_transp|transp_white|transp_black|write_back|</kbd></li><pre>
+        blend_white|blend_black]
+   Apply required changes to selected images
+   invert: invert colors
+   white_transp: transform white color to transparent (alpha=0)
+   black_transp: transform black color to transparent (alpha=0)
+   transp_white: transform transparent to white color
+   transp_black: transform transparent to black color
+   blend_white:  blend with white background and remove alpha
+   blend_black:  blend with black background and remove alpha
+   write_back:   write resulting image back into `image_data` attribute</pre>
+   <li><kbd>       instance sym_name x y rot flip [prop] [n]</kbd></li><pre>
+   Place a new instance of symbol 'sym_name' at position x,y,
+   rotation and flip  set to 'rot', 'flip'
+   if 'prop' is given it is the new instance attribute
+   string (default: symbol template string)
+   if 'n' is given it must be 0 on first call
+   and non zero on following calls
+   It is used only for efficiency reasons if placing multiple instances </pre>
+   <li><kbd>       instance_bbox inst</kbd></li><pre>
+   return instance and symbol bounding boxes
+   'inst' can be an instance name or number </pre>
+   <li><kbd>       instance_coord [instance]</kbd></li><pre>
+   Return instance name, symbol name, x placement coord, y placement coord, rotation and flip
+   of selected instances
+   if 'instance' is given (instance name or number) return data about specified instance
+   Example:
+     xschem [~] xschem instance_coord
+     {R5} {res.sym} 260 260 0 0
+     {C1} {capa.sym} 150 150 1 1 </pre>
+   <li><kbd>       instance_list</kbd></li><pre>
+   Return a list of 3-items. Each 3-item is
+   an instance name followed by the symbol reference and symbol type.
+   Example: xschem instance_list --&gt;
+     {x1}  {sky130_tests/bandgap.sym} {subcircuit}
+     {...} {...}                      {...}
+     ...</pre>
+   <li><kbd>       instance_net inst pin</kbd></li><pre>
+   Return the name of the net attached to pin 'pin' of instance 'inst'
+   Example: xschem instance_net x3 MINUS --&gt; REF </pre>
+   <li><kbd>       instance_nodemap inst [pin]</kbd></li><pre>
+   Return the instance name followed by a list of 'pin net' associations
+   example:  xschem instance_nodemap x3
+   --&gt; x3 PLUS LED OUT LEVEL MINUS REF
+   instance x3 pin PLUS is attached to net LED, pin OUT to net LEVEL and so on...
+   If 'pin' is given restrict map to only that pin </pre>
+   <li><kbd>       instance_number inst [n]</kbd></li><pre>
+   Return the position of instance 'inst' in the instance array
+   If 'n' is given set indicated instance position to 'n' </pre>
+   <li><kbd>       instance_pin_coord inst attr value</kbd></li><pre>
+   Return the name and coordinates of pin with
+   attribute 'attr' set to 'value' of instance 'inst'
+   'inst can be an instance name or a number
+   Example: xschem instance_pin_coord x3 name MINUS --&gt; {MINUS} 600 -840 </pre>
+   <li><kbd>       instance_pins inst</kbd></li><pre>
+   Return list of pins of instance 'inst'
+   'inst can be an instance name or a number </pre>
+   <li><kbd>       instance_pos inst</kbd></li><pre>
+   Get number (position) of instance name 'inst' </pre>
+   <li><kbd>       instances_to_net net</kbd></li><pre>
+   Return list of instances names and pins attached to net 'net'
+   Example: xschem instances_to_net PANEL
+    --&gt; { {Vsw} {plus} {580} {-560} } { {p2} {p} {660} {-440} }
+        { {Vpanel1} {minus} {600} {-440} } </pre>
+   <li><kbd>       is_generator symbol</kbd></li><pre>
+   tell if 'symbol' is a generator (symbol(param1,param2,...) </pre>
+   <li><kbd>       line [x1 y1 x2 y2] [pos] [propstring] [draw]</kbd></li><pre>
+       line
+       line gui
+   if 'x1 y1 x2 y2'is given place line on current
+   layer (rectcolor) at indicated coordinates.
+   if 'pos' is given insert at given position in line array.
+   if 'pos' set to -1 append to last element in line array.
+   'propstring' is the attribute string. Set to empty if not given.
+   if 'draw' is set to 1 (default) draw the new object, else don't
+   If no coordinates are given start a GUI operation of line placement
+   if `gui` argument is given start a line GUI placement with 1st point
+   set to current mouse coordinates </pre>
+   <li><kbd>       line_width n</kbd></li><pre>
+   set line width to floating point number 'n' </pre>
+   <li><kbd>       list_hierarchy</kbd></li><pre>
+   List all schematics at or below current hierarchy with modification times.
+   Example: xschem list_hiearchy
+   --&gt;
+   20230302_003134  {/home/.../ngspice/solar_panel.sch}
+   20230211_010031  {/home/.../ngspice/pv_ngspice.sch}
+   20221011_175308  {/home/.../ngspice/diode_ngspice.sch}
+   20221014_091945  {/home/.../ngspice/comp_ngspice.sch}</pre>
+   <li><kbd>       list_hilights [sep | all | all_nets | all_inst]</kbd></li><pre>
+    Sorted list of non port or non top level current level highlight nets,
+    separated by character 'sep' (default: space)
+    if `all_inst` is given list all instance hilights
+    if `all_nets` is given list all net hilights
+    if `all` is given list all hash content </pre>
+   <li><kbd>       list_nets</kbd></li><pre>
+    List all nets with type (in / out / inout / net) </pre>
+   <li><kbd>       list_tokens str with_quotes</kbd></li><pre>
+   List tokens in string 'str'
+   with_quotes:
+   0: eat non escaped quotes (")
+   1: return unescaped quotes as part of the token value if they are present
+   2: eat backslashes </pre>
+   <li><kbd>       load [-nosymbols|-gui|-noundoreset|-nofullzoom|-keep_symbols] f</kbd></li><pre>
+   Load a new file 'f'.
+   '-gui': ask to save modified file or warn if opening an already
+       open file or opening a new(not existing) file.
+   '-noundoreset': do not reset the undo history
+   '-nosymbols': do not load symbols (used if loading a symbol instead of
+       a schematic)
+   '-nofullzoom': do not do a full zoom on new schematic.
+   '-nodraw': do not draw.
+   '-keep_symbols': retain symbols that are already loaded.</pre>
+   <li><kbd>       load_new_window [f]</kbd></li><pre>
+   Load schematic in a new tab/window. If 'f' not given prompt user
+   if 'f' is given as empty '{}' then open untitled.sch </pre>
+   <li><kbd>       log f</kbd></li><pre>
+   If 'f' is given output stderr messages to file 'f'
+   if 'f' is not given and a file log is open, close log
+   file and resume logging to stderr </pre>
+   <li><kbd>       load_symbol [symbol_file]</kbd></li><pre>
+   Load specified symbol_file
+   Returns:
+     &gt;= 0: symbol is already loaded or has been loaded
+     &lt;  0: symbol was not loaded</pre>
+   <li><kbd>       log_write text</kbd></li><pre>
+   write given string to log file, so tcl can write messages on the log file</pre>
+   <li><kbd>       logic_get_net net_name</kbd></li><pre>
+   Get logic state of net named 'net_name'
+   Returns 0, 1, 2, 3 for logic levels 0, 1, X, Z or nothing if no net found.</pre>
+   <li><kbd>       logic_set_net net_name n [num]</kbd></li><pre>
+   set 'net_name' to logic level 'n' 'num' times.
+   'n':
+       0  set to logic value 0
+       1  set to logic value 1
+       2  set to logic value X
+       3  set to logic value Z
+      -1  toggle logic valie (1-&gt;0, 0-&gt;1)
+   the 'num' parameter is essentially useful only with 'toggle' (-1)  value</pre>
+   <li><kbd>       logic_set n [num]</kbd></li><pre>
+   set selected nets, net labels or pins to logic level 'n' 'num' times.
+   'n':
+       0  set to logic value 0
+       1  set to logic value 1
+       2  set to logic value X
+       3  set to logic value Z
+      -1  toggle logic valie (1-&gt;0, 0-&gt;1)
+   the 'num' parameter is essentially useful only with 'toggle' (-1)  value</pre>
+   <li><kbd>       make_sch</kbd></li><pre>
+   Make a schematic from selected symbol </pre>
+   <li><kbd>       make_sch_from_sel</kbd></li><pre>
+   Create an LCC instance from selection and place it instead of selection
+   also ask if a symbol (.sym) file needs to be created </pre>
+   <li><kbd>       make_symbol</kbd></li><pre>
+   From current schematic (circuit.sch) create a symbol (circuit.sym)
+   using ipin.sym, opin.sym, iopin.sym in schematic
+   to deduce symbol interface pins. </pre>
+   <li><kbd>       merge [f]</kbd></li><pre>
+   Merge another file. if 'f' not given prompt user. </pre>
+   <li><kbd>       move_instance inst x y rot flip [nodraw] [noundo]</kbd></li><pre>
+   resets instance coordinates, and rotaton/flip. A dash will keep existing value
+   if 'nodraw' is given do not draw the moved instance
+   if 'noundo' is given operation is not undoable </pre>
+   <li><kbd>       move_objects [dx dy] [kissing] [stretch]</kbd></li><pre>
+   Start a move operation on selection and let user terminate the operation in the GUI
+   if kissing is given add nets to pins that touch other instances or nets
+   if stretch is given stretch connected nets to follow instace pins
+   if dx and dy are given move by that amount. </pre>
+   <li><kbd>       my_strtok_r str delim quote keep_quote</kbd></li><pre>
+       test for my_strtok_r() function </pre>
+   <li><kbd>       net_label [type]</kbd></li><pre>
+   Place a new net label
+   'type': 1: place a 'lab_pin.sym' label
+           0: place a 'lab_wire.sym' label
+   User should complete the placement in the GUI. </pre>
+   <li><kbd>       net_pin_mismatch</kbd></li><pre>
+   Highlight nets attached to selected symbols with
+   a different name than symbol pin </pre>
+   <li><kbd>       netlist [-keep_symbols|-noalert|-messages|-erc | -nohier] [filename]</kbd></li><pre>
+   do a netlist of current schematic in currently defined netlist format
+   if 'filename'is given use specified name for the netlist
+   if 'filename' contains path components place the file in specified path location.
+   if only a name is given and no path ('/') components are given use the
+   default netlisting directory.
+   This means that 'xschem netlist test.spice' and 'xschem netlist ./test.spice'
+   will create the netlist in different places.
+   netlisting directory is reset to previous setting after completing this command
+   If -messages is given return the ERC messages instead of just a fail (1)
+   or no fail (0) code. 
+   If -erc is given it means netlister is called from gui, enable show infowindow
+   If -nohier is given netlist only current level
+   If -keep_symbols is given no not purge symbols encountered traversing the
+   design hierarchy </pre>
+   <li><kbd>       new_process [f]</kbd></li><pre>
+   Start a new xschem process for a schematic.
+   If 'f' is given load specified schematic. </pre>
+   <li><kbd>       new_schematic create|destroy|destroy_all|switch win_path file [draw]</kbd></li><pre>
+   Open/destroy a new tab or window
+     create: create new empty window or with 'file' loaded if 'file' given.
+             The win_path must be given (even {} is ok).
+             non empty win_path ({1}) will avoid warnings if opening the
+             same file multiple times.
+     destroy: destroy tab/window identified by win_path. Example:
+              xschem new_schematic destroy .x1.drw
+     destroy_all: close all tabs/additional windows
+              if the 'force'argument is given do not issue a warning if modified
+              tabs are about to be closed.
+     switch: switch context to specified 'win_path' window or specified schematic name
+              If 'draw' is given and set to 0 do not redraw after switching tab
+              (only tab i/f)
+   Main window/tab has win_path set to .drw,
+   Additional windows/tabs have win_path set to .x1.drw, .x2.drw and so on...</pre>
+   <li><kbd>       only_probes</kbd></li><pre>
+       dim schematic to better show highlights </pre>
+   <li><kbd>       origin x y [zoom]</kbd></li><pre>
+   Move origin to 'x, y', optionally changing zoom level to 'zoom'
+   A dash ('-') given for x or y will keep existing value </pre>
+   <li><kbd>       parse_cmd</kbd></li><pre>
+   debug command to test parse_cmd_string()
+   splits a command string into argv-like arguments
+   return # of args in *argc
+   argv[*argc] is always set to NULL </pre>
+   <li><kbd>       parselabel str</kbd></li><pre>
+   Debug command to test vector net syntax parser </pre>
+   <li><kbd>       paste [x y]</kbd></li><pre>
+   Paste clipboard. If 'x y' not given user should complete placement in the GUI </pre>
+   <li><kbd>       pinlist inst [attr]</kbd></li><pre>
+   List all pins of instance 'inst'
+   if no 'attr' is given return full attribute string,
+   else return value for attribute 'attr'.
+   Example: xschem pinlist x3 name
+   --&gt;  { {0} {PLUS} } { {1} {OUT} } { {2} {MINUS} }
+   Example: xschem pinlist x3 dir
+   --&gt;  { {0} {in} } { {1} {out} } { {2} {in} }
+   Example: xschem pinlist x3
+   --&gt; { {0} {name=PLUS dir=in } } { {1} {name=OUT dir=out } }
+       { {2} {name=MINUS dir=in } }</pre>
+   <li><kbd>       place_symbol [sym_name] [prop]</kbd></li><pre>
+   Start a GUI placement operation of specified 'sym_name' symbol.
+   If 'sym_name' not given prompt user
+   'prop' is the attribute string of the symbol.
+   If not given take from symbol template attribute.</pre>
+   <li><kbd>       place_text</kbd></li><pre>
+   Start a GUI placement of a text object </pre>
+   <li><kbd>       polygon [gui]</kbd></li><pre>
+   Start a GUI placement of a polygon
+   if `gui` argument is given start a polygon GUI placement with 1st point
+   set to current mouse coordinates </pre>
+   <li><kbd>       preview_window create|draw|destroy|close [win_path] [file]</kbd></li><pre>
+   destroy: will delete preview schematic data and destroy container window
+   close: same as destroy but leave the container window.
+   Used in fileselector to show a schematic preview.</pre>
+   <li><kbd>       print png|svg|ps|pdf|ps_full|pdf_full img_file [img_x img_y] [x1 y1 x2 y2]</kbd></li><pre>
+   If img_x and img_y are set to 0 (recommended for svg and ps/pdf)
+   they will be calculated by xschem automatically
+   if img_x and img_y are given they will set the bitmap size, if
+   area to export is not given then use the selection boundbox if
+   a selection exists or do a full zoom.
+   Export current schematic to image.
+                            img x   y size    xschem area to export
+      0     1    2    3         4   5             6    7   8   9
+   xschem print png file.png  [400 300]       [ -300 -200 300 200 ]
+   xschem print svg file.svg  [400 300]       [ -300 -200 300 200 ]
+   xschem print ps  file.ps   [400 300]       [ -300 -200 300 200 ]
+   xschem print eps file.eps  [400 300]       [ -300 -200 300 200 ]
+   xschem print pdf file.pdf  [400 300]       [ -300 -200 300 200 ]
+   xschem print ps_full  file.ps
+   xschem print pdf_full file.pdf</pre>
+   <li><kbd>       print_hilight_net show</kbd></li><pre>
+   from highlighted nets/pins/labels:
+   show == 0   ==&gt; create pins from highlight nets
+   show == 1   ==&gt; show list of highlight net in a dialog box
+   show == 2   ==&gt; create labels with i prefix from hilight nets
+   show == 3   ==&gt; show list of highlight net with path and label
+                  expansion in a dialog box
+   show == 4   ==&gt; create labels without i prefix from hilight nets
+   for show = 0, 2, 4 user should complete GUI placement
+   of created objects </pre>
+   <li><kbd>       print_spice_element inst</kbd></li><pre>
+   Print spice raw netlist line for instance (number or name) 'inst' </pre>
+   <li><kbd>       propagate_hilights [set clear]</kbd></li><pre>
+   Debug: wrapper to propagate_hilights() function </pre>
+   <li><kbd>       push_undo</kbd></li><pre>
+   Push current state on undo stack </pre>
+   <li><kbd>       raw what ...</kbd></li><pre>
+     what = add | clear | datasets | index | info | loaded | list |
+            new | points | rawfile | del | read | set | rename |
+            sim_type | switch | switch_back | table_read | value | values | pos_at | vars |
+      
+   xschem raw read filename [type [sweep1 sweep2]]
+     if sweep1, sweep2 interval is given in 'read' subcommand load only the interval
+     sweep1 &lt;= sweep_var &lt; sweep2
+     type is the analysis type to load (tran, dc, ac, op, ...). If not given load first found in
+     raw file.
+      
+   xschem raw clear [rawfile [type]]
+     unload given file and type. If type not given delete all type sfrom rawfile
+     If a number 'n' is given as 'rawfile' delete the 'nth' raw file
+     if no file is given unload all raw files.
+      
+   xschem raw del name
+     delete named vector from current raw file
+      
+   xschem raw rename old_name new_name
+     rename a node in the loaded raw file.
+      
+   xschem raw info
+     print information about loaded raw files and show the currently active one.
+      
+   xschem raw new name type sweepvar start end step
+     create a new raw file with sweep variable 'sweepvar' with number=(end - start) / step datapoints
+     from start value 'start' and step 'step'
+      
+   xschem raw list
+     get list of saved simulation variables
+      
+   xschem raw vars
+     get number of simulation variables
+      
+   xschem raw switch [n | rawfile type]
+     make the indicated 'rawfile, type' the active one
+     else if a number n is specified make the n-th raw data the active one.
+     if no file or number is specified then switch to the next rawdata in the list.
+      
+   xschem switch_back
+     switch to previously active rawdata.
+      
+   xschem raw datasets
+     get number of datasets (simulation runs)
+      
+   xschem raw value node n [dset]
+     return n-th value of 'node' in raw file
+     dset is the dataset to look into in case of multiple runs (first run = 0).
+     if dset = -1 consider n as the absolute position into the whole data file
+     (all datasets combined).
+     If n is given as empty string {} return value at cursor b,
+     dset not used in this case
+      
+   xschem raw loaded
+     return hierarchy level where raw file was loaded or -1 if no raw loaded
+      
+   xschem raw rawfile
+      return raw filename
+      
+   xschem raw sim_type
+      return raw loaded simulation type (ac, op, tran, ...)
+      
+   xschem raw index node
+     get index of simulation variable 'node'.
+     Example:  raw index v(led) --&gt; 46
+      
+   xschem raw values node [dset]
+     print all simulation values of 'node' for dataset 'dset' (default dset=0)
+     dset= -1: print all values for all datasets
+      
+   xschem raw pos_at node value [dset] [from_start] [to_end]
+     returns the position, starting from 0 or from_start if given, to the end of dataset
+     or to_end if given of the first point 'p' where node[p] and node[p+1] bracket value.
+     If dset not given assume dset 0 (first one)
+     This is usually done on the sweep (time) variable in transient sims where timestep is
+     not uniform
+      
+   xschem raw points [dset]
+     print simulation points for dataset 'dset' (default: all dataset points combined)
+      
+   xschem raw set node n value [dset]
+     change loaded raw file data node[n] to value
+     dset is the dataset to look into in case of multiple runs (first run = 0)
+     dset = -1: consider n as the absolute position in the whole raw file
+     (all datasets combined)
+      
+   xschem raw table_read tablefile
+     read a tabular data file.
+     First line is the header line containing variable names.
+     data is presented in column format after the header line
+     First column is sweep (x-axis) variable
+     Double empty lines start a new dataset
+     Single empty lines are ignored
+     Datasets can have different # of lines.
+     new dataset do not start with a header row.
+     Lines beginning with '#' are comments and ignored
+      
+        time    var_a   var_b   var_cnode in the loaded raw file.
+     # this is a comment, ignored
+         0.0     0.0     1.8    0.3
+       &lt;single empty line: ignored&gt;
+         0.1     0.0     1.5    0.6
+         ...     ...     ...    ...
+       &lt;empty line&gt;
+       &lt;Second empty line: start new dataset&gt;
+         0.0     0.0     1.8    0.3
+         0.1     0.0     1.5    0.6
+         ...     ...     ...    ...
+      
+   xschem raw add varname [expr] [sweep_var]
+     add a 'varname' vector with all values set to 0 to loaded raw file if expr not given
+     otherwise initialize data with values calculated from expr.
+     if expr is given and also sweep_var is given use indicated sweep_var for expressions
+     that need it. If sweep_var not given use first raw file variable as sweep variable.
+     If varname is already existing and expr given recalculate data
+     Example: xschem raw add power {outm outp - i(@r1[i]) *}
+      </pre>
+   <li><kbd>       raw_clear</kbd></li><pre>
+   Unload all simulation raw files
+   You can use xschem raw clear as well.</pre>
+   <li><kbd>       raw_read [file] [sim] [sweep1 sweep2]</kbd></li><pre>
+   If a raw file is already loaded delete from memory
+   then load specified file and analysis 'sim' (dc, ac, tran, op, ...)
+   If 'sim' not specified load first section found in raw file.
+   if sweep1, sweep2 interval is given load only the interval
+   sweep1 &lt;= sweep_var &lt; sweep2 </pre>
+   <li><kbd>       raw_read_from_attr [sim]</kbd></li><pre>
+   If a simulation raw file is already loaded delete from memory
+   else read section 'sim' (tran, dc, ac, op, ...)
+   of base64 encoded data from a 'spice_data'
+   attribute of selected instance
+   If sim not given read first section found </pre>
+   <li><kbd>       rebuild_connectivity</kbd></li><pre>
+   Rebuild logical connectivity abstraction of schematic </pre>
+   <li><kbd>       rebuild_selection</kbd></li><pre>
+   Rebuild selection list</pre>
+   <li><kbd>       record_global_node n node</kbd></li><pre>
+   call the record_global_node function (list of netlist global nodes) </pre>
+   <li><kbd>       rect ...</kbd></li><pre>
+   rect [x1 y1 x2 y2] [pos] [propstring] [draw]
+     if 'x1 y1 x2 y2'is given place recangle on current
+     layer (rectcolor) at indicated coordinates.
+     if 'pos' is given insert at given position in rectangle array.
+     if 'pos' set to -1 append rectangle to last element in rectangle array.
+     'propstring' is the attribute string. Set to empty if not given.
+     if 'draw' is set to 1 (default) draw the new object, else don't
+   rect
+     If no coordinates are given start a GUI operation of rectangle placement
+   rect gui
+     if `gui` argument is given start a GUI placement of a rectangle with 1st
+     point starting from current mouse coordinates </pre>
+   <li><kbd>       redo</kbd></li><pre>
+   Redo last undone action </pre>
+   <li><kbd>       redraw</kbd></li><pre>
+   redraw window </pre>
+   <li><kbd>       reload</kbd></li><pre>
+   Forced (be careful!) Reload current schematic from disk </pre>
+   <li><kbd>       reload_symbols</kbd></li><pre>
+   Reload all used symbols from disk </pre>
+   <li><kbd>       remove_symbols</kbd></li><pre>
+   Internal command: remove all symbol definitions </pre>
+   <li><kbd>       replace_symbol inst new_symbol [fast]</kbd></li><pre>
+   Replace 'inst' symbol with 'new_symbol'
+   If doing multiple substitutions set 'fast' to {}
+    on first call and 'fast' on next calls
+   for faster operation.
+   do a 'xschem redraw' at end to update screen
+   Example: xschem replace_symbol R3 capa.sym </pre>
+   <li><kbd>       reset_caches</kbd></li><pre>
+   Reset cached instance and symbol cached flags (inst-&gt;flags, sym-&gt;flags) </pre>
+   <li><kbd>       reset_inst_prop inst</kbd></li><pre>
+   Reset instance attribute string taking it from symbol template string </pre>
+   <li><kbd>       reset_symbol inst symref</kbd></li><pre>
+   This is a low level command, it merely changes the xctx-&gt;inst[...].name field.
+   It is caller responsibility to delete all symbols before and do a reload_symbols
+   afterward </pre>
+   <li><kbd>       resetwin create_pixmap clear_pixmap force w h</kbd></li><pre>
+   internal command: calls resetwin() </pre>
+   <li><kbd>       resolved_net [net]</kbd></li><pre>
+   if 'net' is given  return its topmost full hierarchy name
+   else returns the topmost full hierarchy name of selected net/pin/label.
+   Nets connected to I/O ports are mapped to upper level recursively </pre>
+   <li><kbd>       rotate [x0 y0]</kbd></li><pre>
+   Rotate selection around point x0 y0.
+   if x0, y0 not given use mouse coordinates </pre>
+   <li><kbd>       rotate_in_place</kbd></li><pre>
+   Rotate selected objects around their 0,0 coordinate point </pre>
+   <li><kbd>       round_to_n_digits i n</kbd></li><pre>
+   round number 'i' to 'n' digits </pre>
+   <li><kbd>       save [fast]</kbd></li><pre>
+   Save schematic if modified. Does not ask confirmation!
+   if 'fast' is given it is passed to save_schematic() to avoid
+   updating window/tab/sim button states </pre>
+   <li><kbd>       saveas [file] [type]</kbd></li><pre>
+   save current schematic as 'file'
+   if file is empty ({}) use current schematic name
+   as defalt and prompt user with file selector
+   'type' is used used to set/change file extension:
+     schematic: save as schematic (*.sch)
+     symbol: save as symbol (*.sym)
+     If not specified default to schematic (*.sch)
+   Does not ask confirmation if file name given</pre>
+   <li><kbd>       sch_pinlist</kbd></li><pre>
+   List a 2-item list of all pins  and directions of current schematic
+   Example: xschem sch_pinlist
+   --&gt;  {PLUS} {in} {OUT} {out} {MINUS} {in} {VCC} {inout} {VSS} {inout}</pre>
+   <li><kbd>       schematic_in_new_window [new_process] [nodraw] [force]</kbd></li><pre>
+   When a symbol is selected edit corresponding schematic
+   in a new tab/window if not already open.
+   If nothing selected open another window of the second
+   schematic (issues a warning).
+   if 'new_process' is given start a new xschem process
+   if 'nodraw' is given do not draw loaded schematic
+   returns '1' if a new schematic was opened, 0 otherwise </pre>
+   <li><kbd>       search regex|exact select tok val [match_case]</kbd></li><pre>
+   Search instances / wires / rects / texts with attribute string containing 'tok'
+   and value 'val'
+   search can be exact ('exact') or as a regular expression ('regex')
+   select:
+      0 : highlight matching instances
+      1 : select matching instances
+     -1 : unselect matching instances
+   'tok' set as:
+       propstring : will search for 'val' in the entire
+       *instance* attribute string.
+       cell::propstring : will search for 'val' in the entire
+       *symbol* attribute string.
+       cell::name : will search for 'val' in the symbol name
+       cell::&lt;attr&gt; will search for 'val' in symbol attribute 'attr'
+         example: xschem search regex 0 cell::template GAIN=100
+    match_case:
+      1 : Match case
+      0 : Do not match case
+      If not given assume 1 (Match case)</pre>
+   <li><kbd>       select instance|wire|text id [clear] [fast]</kbd></li><pre>
+       select rect|line|poly|arc layer id [clear] [fast]
+       Select indicated instance or wire or text, or
+       Select indicated (layer, number) rectangle, line, polygon, arc.
+       For 'instance' 'id' can be the instance name or number
+       for all other objects 'id' is the position in the respective arrays
+       if 'clear' is specified does an unselect operation
+       if 'fast' is specified avoid sending information to infowindow and status bar
+       if 'nodraw' is given on select instance do not draw selection
+       returns 1 if something selected, 0 otherwise </pre>
+   <li><kbd>       select_all</kbd></li><pre>
+   Selects all objects in schematic </pre>
+   <li><kbd>       select_dangling_nets</kbd></li><pre>
+   Select all nets/labels that are dangling, ie not attached to any non pin/port/probe components
+   Returns number of selected items (wires,labels) if danglings found, 0 otherwise </pre>
+   <li><kbd>       select_hilight_net</kbd></li><pre>
+   Select all highlight objects (wires, labels, pins, instances) </pre>
+   <li><kbd>       select_inside x1 y1 x2 y2 [sel]</kbd></li><pre>
+   Select all objects inside the indicated area
+   if [sel] is set to '0' do an unselect operation </pre>
+   <li><kbd>       selected_set [what]</kbd></li><pre>
+   Return a list of selected instance names
+   If what is not given or set to 'inst' return list of selected instance names
+   If what set to 'rect' return list of selected rectangles with their coordinates
+   If what set to 'text' return list of selected texts with their coordinates </pre>
+   <li><kbd>       selected_wire</kbd></li><pre>
+  Return list of selected nets </pre>
+   <li><kbd>       send_to_viewer</kbd></li><pre>
+   Send selected wires/net labels/pins/voltage source or ammeter currents to current
+   open viewer (gaw or bespice) </pre>
+   <li><kbd>       set var value</kbd></li><pre>
+   Set C variable 'var' to 'value' </pre>
+   <ul>
+     <li><kbd> cadgrid </kbd> set cad grid (default: 20) </li>
+     <li><kbd> cadsnap </kbd> set mouse snap (default: 10) </li>
+     <li><kbd> color_ps </kbd> set color psoscript (1 or 0) </li>
+     <li><kbd> crosshair_layer </kbd> set layer for mouse crosshair </li>
+     <li><kbd> constr_mv </kbd> set constrained move (1=horiz, 2=vert, 0=none) </li>
+     <li><kbd> cursor1_x </kbd> set graph cursor1 position </li>
+     <li><kbd> cursor2_x </kbd> set graph cursor2 position </li>
+     <li><kbd> draw_window </kbd> set drawing to window (1 or 0) </li>
+     <li><kbd> fix_broken_tiled_fill </kbd> alternate drawing method for broken GPUs </li>
+     <li><kbd> fix_mouse_coord </kbd> fix for wrong mouse coords in RDP software </li>
+     <li><kbd> format </kbd> set name of custom format attribute used for netlisting </li>
+     <li><kbd> header_text </kbd> set header metadata (used for license info) </li>
+     <li><kbd> hide_symbols </kbd> set to 0,1,2 for various hiding level of symbols </li>
+     <li><kbd> hilight_color </kbd> set hilight color for next hilight </li>
+     <li><kbd> infowindow_text </kbd> ERC messages </li>
+     <li><kbd> intuitive_interface </kbd> ERC messages </li>
+     <li><kbd> netlist_name </kbd> set custom netlist name </li>
+     <li><kbd> netlist_type </kbd> set netlisting mode (spice, verilog, vhdl, tedax, symbol) </li>
+     <li><kbd> no_draw </kbd> set no drawing flag (0 or 1) </li>
+     <li><kbd> no_undo </kbd> set to 1 to disable undo </li>
+     <li><kbd> raw_level </kbd> set hierarchy level loaded raw file refers to </li>
+     <li><kbd> rectcolor </kbd> set current layer (0, 1, .... , cadlayers-1) </li>
+     <li><kbd> sch_to_compare </kbd> set name of schematic to compare current window with </li>
+     <li><kbd> schsymbolprop </kbd> set global symbol attribute string </li>
+     <li><kbd> schprop </kbd> set schematic global spice attribute string </li>
+     <li><kbd> schverilogprop </kbd> set schematic global verilog attribute string </li>
+     <li><kbd> schvhdlprop </kbd> set schematic global vhdl attribute string </li>
+     <li><kbd> schtedaxprop </kbd> set schematic global tedax attribute string </li>
+     <li><kbd> text_svg </kbd> set to 1 to use svg &lt;text&gt; elements </li>
+     <li><kbd> semaphore </kbd> debug </li>
+     <li><kbd> show_hidden_texts </kbd> set to 1 to enable showing texts with attr hide=true </li>
+     <li><kbd> sym_txt </kbd> set to 0 to hide symbol texts </li>
+   </ul>
+   <li><kbd>       set_different_tok str new_str old_str</kbd></li><pre>
+   Return string 'str' replacing/adding/removing tokens that are
+   different between 'new_str' and 'old_str' </pre>
+   <li><kbd>       set_modify [n]</kbd></li><pre>
+   Force modify status on current schematic
+   integer 'n':
+   0 : clear modified flag, update title and tab names, upd. simulation button colors.
+   1 : set modified flag, update title and tab names, upd. simulation button colors, rst floater caches.
+   2 : clear modified flag, do nothing else.
+   3 : set modified flag, do nothing else.
+  -1 : set title, rst floater caches.
+  -2 : rst floater caches, update simulation button colors (Simulate, Waves, Netlist).</pre>
+   <li><kbd>       setprop [-fast|-fastundo] instance|symbol|text|rect ref tok [val]</kbd></li><pre>
+      
+       setprop [-fast] instance inst [tok] [val]
+   set attribute 'tok' of instance (name or number) 'inst' to value 'val'
+   If 'tok' set to 'allprops' replace whole instance prop_str with 'val'
+   If 'val' not given (no attribute value) delete attribute from instance
+   If 'tok' not given clear completely instance attribute string
+   If '-fast' argument if given does not redraw and is not undoable
+      
+       setprop symbol name tok [val]
+   Set attribute 'tok' of symbol name 'name' to 'val'
+   If 'val' not given (no attribute value) delete attribute from symbol
+   This command is not very useful since changes are not saved into symbol
+   and netlisters reload symbols, so changes are lost anyway.
+      
+       setprop rect [-fast|-fastundo] lay n tok [val]
+   Set attribute 'tok' of rectangle number'n' on layer 'lay'
+   If 'val' not given (no attribute value) delete attribute from rect
+   If '-fast' argument is given does not redraw and is not undoable
+   If '-fastundo' s given same as above but action is undoable.
+      
+       setprop rect 2 n fullxzoom
+       setprop rect 2 n fullyzoom
+   These commands do full x/y zoom of graph 'n' (on layer 2, this is hardcoded).
+      
+       setprop [-fast|-fastundo] text n [tok] [val]
+   Set attribute 'tok' of text number 'n'
+   If 'tok' not specified set text string (txt_ptr) to value
+   If "txt_ptr" is given as token replace the text txt_ptr ("the text")
+   If 'val' not given (no attribute value) delete attribute from text
+   If '-fast' argument is given does not redraw and is not undoable
+   If '-fastundo' is given same as above but action is undoable.</pre>
+   <li><kbd>       simulate [callback]</kbd></li><pre>
+   Run a simulation (start simulator configured as default in
+   Tools -&gt; Configure simulators and tools)
+   If 'callback' procedure name is given execute the procedure when simulation
+   is finished. all execute(..., id) data is available (id = execute(id) )
+   A callback prodedure is useful if simulation is launched in background mode
+   ( set sim(spice,1,fg) 0 ) </pre>
+   <li><kbd>       snap_wire</kbd></li><pre>
+   Start a GUI start snapped wire placement (click to start a
+   wire to closest pin/net endpoint) </pre>
+   <li><kbd>       str_replace str rep with [escape] [count]</kbd></li><pre>
+   replace 'rep' with 'with' in string 'str'
+   if rep not preceeded by an 'escape' character </pre>
+   <li><kbd>       subst_tok str tok newval</kbd></li><pre>
+   Return string 'str' with 'tok' attribute value replaced with 'newval' </pre>
+   <li><kbd>       symbol_base_name n</kbd></li><pre>
+   Return the base_name field of a symbol with name or number `n`
+   Normally this is empty. It is set for overloaded symbols, that is symbols
+   derived from the base symbol due to instance based implementation selection
+   (the instance `schematic` attribute) </pre>
+   <li><kbd>       symbol_in_new_window [new_process]</kbd></li><pre>
+   When a symbol is selected edit it in a new tab/window if not already open.
+   If nothing selected open another window of the second schematic (issues a warning).
+   if 'new_process' is given start a new xschem process </pre>
+   <li><kbd>       swap_cursors</kbd></li><pre>
+   swap cursor A (1)  and cursor B (2) positions.</pre>
+   <li><kbd>       swap_windows</kbd></li><pre>
+   swap first and second window in window interface (internal command)</pre>
+   <li><kbd>       switch [window_path |schematic_name]</kbd></li><pre>
+   Switch context to indicated window path or schematic name
+   returns 0 if switch was successfull or 1 in case of errors
+   (no tabs/windows present or no matching win_path / schematic name
+   found).</pre>
+   <li><kbd>       symbols [n | 'derived_symbols']</kbd></li><pre>
+   if 'n' given list symbol with name or number 'n', else list all
+   if 'derived_symbols' is given list also symbols derived from base symbol
+   due to instance based implementation selection. This option must be used
+   after a netlist operation with 'keep_symbols' TCL variable set to 1 </pre>
+   <li><kbd>       tab_list</kbd></li><pre>
+   list all windows / tabs with window pathname and associated filename </pre>
+   <li><kbd>       table_read [table_file]</kbd></li><pre>
+   If a simulation raw file is lodaded unload from memory.
+   else read a tabular file 'table_file'
+   First line is the header line containing variable names.
+   data is presented in column format after the header line
+   First column is sweep (x-axis) variable
+   Double empty lines start a new dataset
+   Single empty lines are ignored
+   Datasets can have different # of lines.
+   new dataset do not start with a header row.
+   Lines beginning with '#' are comments and ignored
+      
+      time    var_a   var_b   var_c
+   # this is a comment, ignored
+       0.0     0.0     1.8    0.3
+     &lt;single empty line: ignored&gt;
+       0.1     0.0     1.5    0.6
+       ...     ...     ...    ...
+     &lt;empty line&gt;
+     &lt;Second empty line: start new dataset&gt;
+       0.0     0.0     1.8    0.3
+       0.1     0.0     1.5    0.6
+       ...     ...     ...    ...</pre>
+   <li><kbd>       test</kbd></li><pre>
+   Testmode ... </pre>
+   <li><kbd>       text x y rot flip text props size draw</kbd></li><pre>
+   Create a text object
+     x, y, rot, flip specify the position and orientation
+     text is the text string
+     props is the attribute string
+     size sets the size
+     draw is a flag. If set to 1 will draw the created text </pre>
+   <li><kbd>       text_string n</kbd></li><pre>
+   get text string of text object 'n' </pre>
+   <li><kbd>       toggle_colorscheme</kbd></li><pre>
+   Toggle dark/light colorscheme </pre>
+   <li><kbd>       toggle_ignore</kbd></li><pre>
+   toggle *_ignore=true attribute on selected instances
+   * = {spice,verilog,vhdl,tedax} depending on current netlist mode </pre>
+   <li><kbd>       touch x1 y1 x2 y2 x0 y0</kbd></li><pre>
+   returns 1 if line {x1 y1 x2 y2} touches point {x0 y0}, 0 otherwise </pre>
+   <li><kbd>       translate n str</kbd></li><pre>
+   Translate string 'str' replacing @xxx tokens with values in instance 'n' attributes
+     Example: xschem translate vref {the voltage is @value}
+     the voltage is 1.8
+   If -1 is given as the instance number try to translate the string without using any
+   instance specific data </pre>
+   <li><kbd>       translate3 str eat_escapes s1 [s2] [s3]</kbd></li><pre>
+   Translate string 'str' replacing @xxx tokens with values in string s1 or if
+     not found in string s2 or if not found in string s3
+     eat_escapes should be either 1 (remove backslashes) or 0 (keep them)
+     Example: xschem translate3 {the voltage is @value} {name=x12} {name=x1 value=1.8}
+     the voltage is 1.8 </pre>
+   <li><kbd>       trim_chars str sep</kbd></li><pre>
+   Remove leading and trailing chars matching any character in 'sep' from str </pre>
+   <li><kbd>       trim_wires</kbd></li><pre>
+   Remove operlapping wires, join lines, trim wires at intersections </pre>
+   <li><kbd>       undo  [redo [set_modify]]</kbd></li><pre>
+   Undo last action. Optional integers redo and set_modify are passed to pop_undo() </pre>
+   <li><kbd>       undo_type disk|memory</kbd></li><pre>
+   Use disk file ('disk') or RAM ('memory') for undo bufer</pre>
+   <li><kbd>       unhilight_all [fast]</kbd></li><pre>
+   if 'fast' is given do not redraw
+   Clear all highlights </pre>
+   <li><kbd>       unhilight</kbd></li><pre>
+   Unhighlight selected nets/pins </pre>
+   <li><kbd>       unselect_all [draw]</kbd></li><pre>
+   Unselect everything. If draw is given and set to '0' no drawing is done </pre>
+   <li><kbd>       unselect_attached_floaters</kbd></li><pre>
+   Unselect objects (not symbol instances) attached to some instance with a 
+   non empty name=... attribute </pre>
+   <li><kbd>       update_all_sym_bboxes</kbd></li><pre>
+   Update all symbol bounding boxes </pre>
+   <li><kbd>       update_op</kbd></li><pre>
+   update tcl ngspice::ngspice array data from raw file point 0 </pre>
+   <li><kbd>       view_prop</kbd></li><pre>
+   View attributes of selected element (read only)
+   if multiple selection show the first element (in xschem  array order) </pre>
+   <li><kbd>       warning_overlapped_symbols [sel]</kbd></li><pre>
+   Highlight or select (if 'sel' set to 1) perfectly overlapped instances
+   this is usually an error and difficult to grasp visually </pre>
+   <li><kbd>       windowid topwin_path</kbd></li><pre>
+   Used by xschem.tcl for configure events (set icon) </pre>
+   <li><kbd>       wire_coord n</kbd></li><pre>
+   return 4 coordinates of wire[n] </pre>
+   <li><kbd>       wire [x1 y1 x2 y2] [pos] [prop] [sel]</kbd></li><pre>
+   wire
+   wire gui
+   Place a new wire
+   if no coordinates are given start a GUI wire placement
+   if `gui` argument is given start a GUI placement of a wire with 1st point
+   starting from current mouse coordinates </pre>
+   <li><kbd>       wire_cut [x y] [noalign]</kbd></li><pre>
+   start a wire cut operation. Point the mouse in the middle of a wire and
+   Alt-click right button.
+   if x and y are given cut wire at given point
+   if noalign is given and is set to 'noalign' do not align the cut point to closest snap point </pre>
+   <li><kbd>       xcb_info</kbd></li><pre>
+   For debug </pre>
+   <li><kbd>       zoom_box [x1 y1 x2 y2] [factor]</kbd></li><pre>
+   Zoom to specified coordinates, if 'factor' is given reduce view (factor &lt; 1.0)
+   or add border (factor &gt; 1.0)
+   If no coordinates are given start GUI zoom box operation </pre>
+   <li><kbd>       zoom_full [center|nodraw|nolinewidth]</kbd></li><pre>
+   Set full view.
+   If 'center' is given center vire instead of lower-left align
+   If 'nodraw' is given don't redraw
+   If 'nolinewidth]' is given don't reset line widths. </pre>
+   <li><kbd>       zoom_hilighted</kbd></li><pre>
+   Zoom to highlighted objects </pre>
+   <li><kbd>       zoom_in</kbd></li><pre>
+   Zoom in drawing </pre>
+   <li><kbd>       zoom_out</kbd></li><pre>
+   Zoom out drawing </pre>
+   <li><kbd>       zoom_selected</kbd></li><pre>
+   Zoom to selection </pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ </ul>
+
+  <!-- TCL global variables -->
+ <h1>XSCHEM <a id="tclglobals">TCL GLOBAL</a> VARIABLES</h1><br>
+
+ <pre class="code">
+   # default command for first spice simulation command (interactive ngspice) 
+   sim(spice,0,cmd) {$terminal -e 'ngspice -i "$N" -a || sh'}
+
+   # flag for foreground (1) or background (0) operation
+   sim(spice,0,fg) 0
+
+   # flag for status dialog box opening (1) at simulation end or not (0)
+   sim(spice,0,st) 0
+
+   sim(spice,1,cmd) {ngspice -b -r "$n.raw" -o "$n.out" "$N"}
+   sim(spice,1,fg) 0
+   sim(spice,1,st) 1
+   sim(spice,2,cmd) "Xyce \"\$N\"\n# Add -r \"\$n.raw\" if you want all variables saved"
+   sim(spice,2,fg) 0
+   sim(spice,2,st) 1
+   sim(spice,3,cmd) {mpirun /path/to/parallel/Xyce "$N"}
+   sim(spice,3,fg) 0
+   sim(spice,3,st) 1
+
+   # Number of configured spice simulation commands (4), [ sim(spice,0,...) ... sim(spice,3,...) ]
+   sim(spice,n) 4
+
+   # default spice command to use (0) --&gt; sim(spice,0,...)
+   sim(spice,default) 0
+
+   sim(spicewave,0,cmd) {gaw "$n.raw" } 
+   sim(spicewave,0,fg) 0
+   sim(spicewave,0,st) 0
+   sim(spicewave,1,cmd) {$terminal -e ngspice}
+   sim(spicewave,1,fg) 0
+   sim(spicewave,1,st) 0
+   sim(spicewave,2,cmd) {rawtovcd -v 1.5 "$n.raw" &gt; "$n.vcd" &amp;&amp; gtkwave "$n.vcd" "$n.sav" 2&gt;/dev/null} 
+   sim(spicewave,2,fg) 0
+   sim(spicewave,2,st) 0
+   sim(spicewave,3,cmd) {$env(HOME)/analog_flavor_eval/bin/bspwave --socket localhost $bespice_listen_port "$n.raw" } 
+   sim(spicewave,3,fg) 0
+   sim(spicewave,3,st) 0
+   sim(spicewave,n) 4
+   sim(spicewave,default) 0
+
+   # list of configured tools. For each of these there is a set of sim(tool,...) settings
+   sim(tool_list) spice spicewave verilog verilogwave vhdl vhdlwave
+
+   sim(verilog,0,cmd) {iverilog -o .verilog_object -g2012 "$N" &amp;&amp; vvp .verilog_object}
+   sim(verilog,0,fg) 0
+   sim(verilog,0,st) 1
+   sim(verilog,n) 1
+   sim(verilog,default) 0
+   sim(verilogwave,0,cmd) {gtkwave dumpfile.vcd "$N.sav" 2&gt;/dev/null}
+   sim(verilogwave,0,fg) 0
+   sim(verilogwave,0,st) 0
+   sim(verilogwave,n) 1
+   sim(verilogwave,default) 0
+   sim(vhdl,0,cmd) {ghdl -c --ieee=synopsys -fexplicit "$N" -r "$s" --wave="$n.ghw"}
+   sim(vhdl,0,fg) 0
+   sim(vhdl,0,st) 1
+   sim(vhdl,n) 1
+   sim(vhdl,default) 0
+   sim(vhdlwave,0,cmd) {gtkwave "$n.ghw" "$N.sav" 2&gt;/dev/null}
+   sim(vhdlwave,0,fg) 0
+   sim(vhdlwave,0,st) 0
+   sim(vhdlwave,n) 1
+   sim(vhdlwave,default) 0
+
+   add_all_windows_drives 1
+   autofocus_mainwindow 1
+   auto_hilight 0
+   autotrim_wires 0
+   bespice_listen_port {}
+   bespice_server_getdata
+   big_grid_points 0
+   bus_replacement_char {} ;# use {&lt;&gt;} to replace [] with &lt;&gt; in bussed signals
+   cadlayers 22
+   cairo_font_line_spacing 1.0
+   cairo_font_name {Sans-Serif}
+   cairo_font_scale 1.0
+   cairo_vert_correct 0
+   case_insensitive 0
+   change_lw 1
+   color_ps 1
+   colors $dark_colors
+   compare_sch 0
+   component_browser_on_top 1
+   connect_by_kissing 0
+   constrained_move 0
+   copy_cell 0
+   dark_colors {
+     "#000000" "#00ccee" "#3f3f3f" "#cccccc" "#88dd00" "#bb2200" "#00ccee" "#ff0000"
+     "#ffff00" "#ffffff" "#ff00ff" "#00ff00" "#0044dd" "#aaaa00" "#aaccaa" "#ff7777"
+     "#bfff81" "#00ffcc" "#ce0097" "#d2d46b" "#ef6158" "#fdb200"}
+   dark_colorscheme 1
+   dark_colors_save
+   debug_var 0
+   delay_flag
+   dim_bg 0.0
+   dim_value 0.0
+   dircolor(/share/doc/xschem/) {#338844}
+   dircolor(/share/xschem/) red
+   disable_unique_names 0
+   download_url_helper {curl -f -s -O}
+   draw_grid 1
+   draw_window 0
+   editor {gvim -f}
+   edit_prop_size 80x12
+   edit_symbol_prop_new_sel {}
+   enable_dim_bg 0
+   enable_layer($i) 1
+   enable_stretch 0
+   en_hilight_conn_inst 0
+   execute(cmd,&lt;id&gt;)
+   execute(data,&lt;id&gt;)
+   execute(status,&lt;id&gt;)
+   execute(cmd,last)
+   execute(data,last)
+   execute(status,last)
+   execute(error,last)
+   execute(exitcode,last)
+   execute(id)
+   flat_netlist 0
+   fullscreen 0
+   gaw_tcp_address {localhost 2020}
+   graph_bus 0
+   graph_logx 0
+   graph_logy 0
+   graph_rainbow 0
+   graph_raw_level -1 ;# hierarchy level where raw file has been loaded 
+   graph_schname {}
+   graph_sel_color 4
+   graph_selected {}
+   graph_sel_wave {}
+   graph_sort 0
+   has_cairo 1
+   has_x
+   hide_empty_graphs 0 ;# if set to 1 waveform boxes will be hidden if no raw file loaded
+   hide_symbols 0
+   incr_hilight 1
+
+   # text saved into the ERC informational dialog box.
+   # netlist warnings and errors are shown here.
+   infowindow_text 
+
+   initial_geometry {900x600}
+   launcher_default_program {xdg-open}
+   light_colors {
+     "#ffffff" "#0044ee" "#aaaaaa" "#222222" "#229900" "#bb2200" "#00ccee" "#ff0000"
+     "#888800" "#00aaaa" "#880088" "#00ff00" "#0000cc" "#666600" "#557755" "#aa2222"
+     "#7ccc40" "#00ffcc" "#ce0097" "#d2d46b" "#ef6158" "#fdb200"}
+   light_colors_save
+   line_width 0
+   live_cursor2_backannotate 0
+
+   # if set use &lt;sch_dir&gt;/simulation for netlist and sims
+   local_netlist_dir 0
+
+   lvs_ignore 0
+   lvs_netlist 0
+   measure_text "y=\nx="
+   menu_debug_var 0
+   myload_files2 {}
+   myload_globfilter {*}
+   myload_index1 0
+   netlist_dir "$USER_CONF_DIR/simulations"
+   netlist_show 0
+   netlist_type spice
+   nocairo_font_xscale .85
+   nocairo_font_yscale .88
+   nocairo_vert_correct 0
+   no_change_attrs 0
+   nolist_libs {}
+   noprint_libs {}
+   only_probes 0  ; # 20110112
+   OS
+   persistent_command 0
+   preserve_unchanged_attrs 0
+   rainbow_colors 0
+   search_schematic 0
+   show_hidden_texts 0
+   show_infowindow 0 
+   show_infowindow_after_netlist 0
+   show_pin_net_names 0
+   spiceprefix 1
+   split_files 0
+   svg_font_name {Sans-Serif}
+   symbol_width 150
+   sym_txt 1
+   tabbed_interface 0
+   tcl_files {}
+   tclstop 0
+   terminal xterm
+   text_line_default_geometry 80x12
+   textwindow_wcounter
+   toolbar_horiz   1
+   toolbar_list {  ... }
+   toolbar_visible 0
+   to_pdf {ps2pdf}
+   to_png {gm convert} 
+   transparent_svg 0
+   undo_type disk
+   unzoom_nodrift 0
+   use_tclreadline 1 ;# use the tclreadline package for command prompt. default: 1
+   USER_CONF_DIR
+   verilog_2001 1
+   verilog_bitblast 0
+   viewdata_wcounter
+   xschem_libs {}
+   xschem_listen_port {}
+   xschem_server_getdata
+   XSCHEM_SHAREDIR
+   XSCHEM_START_WINDOW {}
+   XSCHEM_TMP_DIR {/tmp}
+   zoom_full_center 0
+ </pre>
+
+ <h3> Simulator / waveform setup </h3>
+
+ <p>
+  In xschem a tcl array variable <kbd>sim</kbd> is used to specify external process commands,
+  like simulators and waveform viewers. This variable is set in the GUI with the 
+  <kbd>Simulation-&gt; Configure simulators and tools</kbd> menu entry. First of all you need to set the 
+  <kbd>tool_list</kbd> list of configured tools:</p>
+  <pre class = "code">
+     set sim(tool_list) { spice spicewave verilog verilogwave vhdl vhdlwave } </pre>
+ <p>
+  For each tool you need to define some sub elements:</p>
+  <pre class = "code">
+     # Number of configured spice simulation commands (4), [ sim(spice,0,...) ... sim(spice,3,...) ]
+     sim(spice,n) 4
+     # default spice command to use (0) --&gt; sim(spice,0,...)
+     sim(spice,default) 0
+     # default command for first spice simulation command (interactive ngspice)
+     sim(spice,0,cmd) {$terminal -e 'ngspice -i "$N" -a || sh'}
+     # flag for foreground (1) or background (0) operation
+     sim(spice,0,fg) 0
+     # flag for status dialog box opening (1) at simulation end or not (0)
+     sim(spice,0,st) 0
+     sim(spice,1,cmd) {ngspice -b -r "$n.raw" -o "$n.out" "$N"}
+     sim(spice,1,fg) 0
+     sim(spice,1,st) 1
+     sim(spice,2,cmd) "Xyce \"\$N\"\n# Add -r \"\$n.raw\" if you want all variables saved"
+     sim(spice,2,fg) 0
+     sim(spice,2,st) 1
+     sim(spice,3,cmd) {mpirun /path/to/parallel/Xyce "$N"}
+     sim(spice,3,fg) 0
+     sim(spice,3,st) 1
+  </pre>
+ 
+  <!-- TCL procedures -->
+ <h1>XSCHEM <a id="tclprocs">TCL PROCEDURES</a></h1><br>
+ <p> Commands in brackets are internal procedures, not supposed to be used by end users </p>
+ <pre class = "code">
+      # show xschem about dialog
+      about
+
+      # given a symbol reference 'sym' return its absolute path
+      # Example: % abs_sym_path devices/iopin.sch
+      #          /home/schippes/share/xschem/xschem_library/devices/iopin.sym
+      abs_sym_path sym
+
+      add_ext
+      add_lab_no_prefix
+      add_lab_prefix
+
+      # show an alert dialog box and display 'text'.
+      # if 'position' is empty (example: alert_ {hello, world} {}) show at mouse coordinates
+      # otherwise use specified coordinates example: alert_ {hello, world} +300+400
+      # if nowait is 1 do not wait for user to close dialog box
+      # if yesnow is 1 show yes and no buttons and return user choice (1 / 0).
+      # (this works only if nowait is unset).
+      alert_ text [position] [nowait] [yesno]
+
+      ask_save
+      attach_labels_to_inst
+      balloon
+      balloon_show
+      bespice_getdata
+      bespice_server
+      build_widgets
+      change_color
+      clear_simulate_button
+      color_dim
+      context_menu
+      convert_to_pdf
+      convert_to_png
+      create_layers_menu
+      create_pins
+
+      # pause execution for 'ms milliseconds, keeping event loop responding
+      delay [ms]
+      delete_ctx
+      delete_files
+      delete_tab
+      descend_hierarchy
+      download_url
+      edit_file
+      edit_netlist
+      edit_prop
+      edit_vi_netlist_prop
+      edit_vi_prop
+      enter_text
+
+      # evaluate 'expr'. if 'expr' has errors or does not evaluate return 'expr' as is
+      ev expr
+
+      every
+      execute
+      execute_fileevent
+      execute_wait
+      fill_graph_listbox
+
+      # find file into $paths directories matching $f
+      # use $pathlist global search path if $paths empty
+      # recursively descend directories
+      find_file f [paths]
+
+      # as above, return only first match found
+      find_file_first f [paths]
+
+      # process all symbols in current design, get full path of them if found in 
+      # XSCHEM_LIBRARY_PATH search path, then transform them with exactly one 'n_dir'
+      # path components added.
+      # example: current design has an instance referencing 'lab_pin.sym'
+      #          after executing 'fix_symbols 1' the instance symbol reference
+      #          will be devices/lab_pin.sym. This will be done only on symbols
+      #          that are existing in the current search paths (there is
+      #          devices/lab_pin.sym in one of the search paths).
+      fix_symbols n_dirs
+
+      from_eng
+      gaw_cmd
+      gaw_echoline
+      get_cell
+      get_directory
+      get_file_path
+
+      # launch a terminal shell, if 'curpath' is given set path to 'curpath'
+      get_shell
+
+      graph_add_nodes
+      graph_add_nodes_from_list
+      graph_change_wave_color
+      graph_edit_properties
+      graph_edit_wave
+      graph_get_signal_list
+      graph_show_measure
+      graph_update_nodelist
+      hash_string
+      history
+      housekeeping_ctx
+      infowindow
+      input_line
+      inutile
+      inutile_alias_window
+      inutile_get_time
+      inutile_help_window
+      inutile_line
+      inutile_read_data
+      inutile_template
+      inutile_translate
+      inutile_write_data
+      is_xschem_file
+      key_binding
+      launcher
+      list_hierarchy
+      list_tokens
+      load_file_dialog
+      load_file_dialog_mkdir
+      load_file_dialog_up
+      load_recent_file
+      make_symbol
+      make_symbol_lcc
+
+      # find files into $paths directories matching $f
+      # use $pathlist global search path if $paths empty
+      # recursively descend directories
+      match_file f [paths]
+
+      myload_display_preview
+      myload_getresult
+      myload_place_symbol
+      myload_set_colors1
+      myload_set_colors2
+      myload_set_home
+      netlist
+      next_tab
+      no_open_dialogs
+      order
+      pack_tabs
+      pack_widgets
+      path_head
+      pin_label
+      prev_tab
+      print_help_and_exit
+      probe_net
+      property_search
+
+      # quit xschem closing all tabs/windows (including the first/main) 
+      # user has the option to cancel the closing of modified tabs/windows
+      # if 'force' is given no confirmation is asked and modified content is lost.
+      # the number of schematic views  left over (in addition to main window)
+      #  is returned. If only one (the main view) is left command returns 0.
+      quit_xschem [force]
+
+      raise_dialog
+      read_data
+      read_data_nonewline
+      read_data_window
+      reconfigure_layers_button
+      reconfigure_layers_menu
+      rectorder
+      redef_puts
+
+      # Given an absolute path 'symbol' of a symbol/schematic remove the path prefix
+      # if file is in a library directory (a $pathlist dir)
+      # Example: rel_sym_path /home/schippes/share/xschem/xschem_library/devices/iopin.sym
+      #          devices/iopin.sym
+      rel_sym_path symbol
+      
+      reroute_inst
+      reroute_net
+      reset_colors
+      restore_ctx
+      return_release
+      rotation
+      save_ctx
+      save_file_dialog
+      save_sim_defaults
+      schpins_to_sympins
+      select_inst
+      select_layers
+      set_bindings
+      set_env
+      set_graph_linewidth
+      set_initial_dirs
+      set_missing_colors_to_black
+
+      # set 'var' with '$val' if 'var' not existing
+      set_ne var val
+
+      # set_netlist_dir force [path]
+      # if path is given set as new netlist path where netlists and simulations are done.
+      # force should be always set to 1 unless you just want to query current path.
+      # select_netlist_dir 0 will return current path (you can get with $netlist_dir as well)
+      set_netlist_dir
+
+      set_old_tk_fonts
+
+      # when XSCHEM_LIBRARY_PATH is changed this function is called 
+      # by 'trace_set_paths' refresh and cache new library search paths.
+      set_paths
+      
+      set_replace_key_binding
+
+      # Initialize the tcl sim array variable (if not already set) 
+      # setting up simulator / wave viewer commands
+      set_sim_defaults
+
+      set_tab_names
+      setglob
+      setup_recent_menu
+      setup_tabbed_interface
+      setup_tcp_bespice
+      setup_tcp_gaw
+      setup_tcp_xschem
+      setup_toolbar
+      sframe
+
+      # show ERC (electrical rule check) dialog box
+      show_infotext
+
+      simconf
+      simconf_add
+      simconf_reset
+      simconf_saveconf
+      sim_is_ngspice
+      sim_is_xyce
+      sim_is_Xyce
+      simulate
+      simulate_button
+      simuldir
+      source_user_tcl_files
+      sub_find_file
+      sub_match_file
+      swap_compare_schematics
+      swap_tabs
+
+      # show a dialog box asking user to switch undo bguffer from memory to disk
+      switch_undo
+
+      # evaluate a tcl command from GUI
+      tclcmd
+
+      tclcmd_ok_button
+      tclpropeval
+      tclpropeval2
+      text_line
+      textwindow
+      to_eng
+      tolist
+      toolbar_add
+      toolbar_hide
+      toolbar_show
+
+      # this function executes whenever XSCHEM_LIBRARY_PATH changes (registered
+      # with a 'trace' command)
+      trace_set_paths
+
+      try_download_url
+      update_div
+      update_graph_node
+      update_recent_file
+      update_schematic_header
+      view_current_sim_output
+      waves
+      write_data
+      write_recent_file
+      xschem_getdata
+      xschem_server
+
+ </pre>
+
+ <h1>SOME USEFUL SCRIPT <a id="scripts">EXAMPLES</a></h1><br>
+
+
+ <p> The following examples show the xschem commands one by one. In general you should create small TCL procedures 
+  to perform these tasks. This way you can optimize things, for example creating temporary variables holding the
+  output of the various <kbd>xschem ...</kbd> commands.</p>
+
+
+ <ul>
+
+
+ <li> <h3>Instantiate a component and wire it up with specific nets on its terminals.</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># Create a 5V Vvdd voltage source
+xschem instance vsource.sym 100 100 0 0 {name=Vvdd value=5}</pre>
+     </td></tr>
+ <tr><td><img src="developer_info_08.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># Attach labels, They will get the symbol pin labels
+xschem select instance vvdd
+xschem attach_labels
+</pre> </td></tr>
+<tr><td><img src="developer_info_09.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># Select labels, unselect vsource and change positive and negative terminal
+# labels to VCC and GND respectively
+# The first item in the selected_set list is the first vsource terminal
+# (the positive terminal), the second one is the negative terminal.
+# At the end unselect all
+xschem connected_nets
+xschem select instance Vvdd clear
+xschem setprop instance [lindex [xschem selected_set] 0] lab VCC
+xschem setprop instance [lindex [xschem selected_set] 1] lab GND
+xschem unselect_all
+</pre></td></tr>
+     <tr><td><img src="developer_info_10.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Disable a component in the schematic</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># Add spice_ignore=true attribute
+# the component will be ignored in generated netlists.
+xschem setprop instance Vvdd spice_ignore true
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_11.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Delete a component together with its attached nets</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># select component, select attached nets and delete
+# this will also select wire segments if labels are attached to selected instance with wires.
+xschem select instance Vvdd
+xschem connected_nets
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_12.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># Delete selection
+xschem delete
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_13.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Delete dangling nets and labels</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># If after some editing or deletions dangling nets are present
+# they can all be selected. Deletion may be done with a "xschem delete" command.
+xschem select_dangling_nets
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_14.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Change attributes of a group of components</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># From this situation we want to select all MOS elements with L=2
+# and modify L (gate length) to 3
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_15.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># Do an exact search of elements with L=2
+xschem search exact 1 L 2
+# a more precise search to avoid selecting unwanted elements might be:
+# xschem search regex 1 propstring "L=2\[ \n\].*model=nfet"
+# the above command will do a regular expression search on the whole
+# instance property string (the special token propstring)
+foreach i [xschem selected_set] { xschem setprop instance $i L 3}
+xschem unselect_all
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_16.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Copy a components with its wired terminals</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># From this situation we want to copy Vvdd to a different location
+# and change the instance name, voltage value  and its positive terminal net name
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_17.png"></td></tr>
+
+ <tr><td>  
+        <pre class="code"># select the desired instance
+xschem select instance Vvdd
+# select attached wires
+xschem connected_nets
+# Copy to clipboard
+xschem copy
+# Paste selection 150 x-axis units to the right
+xschem paste 150 0
+# First selected_set item is the voltage source (it was selected first)
+xschem setprop instance [lindex [xschem selected_set] 0] name Vvpp
+xschem setprop instance [lindex [xschem selected_set] 0] value 12
+# Following item is the net label attached to the first symbol pin
+xschem setprop instance [lindex [xschem selected_set] 1] lab VPP 
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_18.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Transform a component into a short</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># We want to transform this voltage source into a short, passing the 
+# negative label onto the positive terminal.
+# Warning: no net label must be present on the positive net, otherwise you end up with 
+# an ERC error (multiple differnet labels on the same net)
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_19.png"></td></tr>
+
+ <tr><td>  
+        <pre class="code"># add spice_ignore=short attribute to instance
+# All pins of the instance will be shorted together to the same net.
+# Instance will be shown in red to indicate the short condition.
+# Option "Options-&gt;Show net name on symbol pins" is enabled and attribute 
+# <kbd>net_name=true</kbd> is set on the resistor to show net names.
+# you see the left resistor terminal is GND now.
+
+xschem setprop instance Vvdd spice_ignore short
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_20.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Move a selected portion of the schematic</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># After selecting some objects...
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_21.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... We move them by some X / Y quantities.
+xschem move_objects 100 0
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_22.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Rotate a selected portion of the schematic</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># After selecting some objects ...
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_23.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... We rotate them clockwise around point 1100,-800 (shown with the red cross)
+xschem rotate 1100 -800
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_24.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Flip a selected portion of the schematic</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># After selecting some objects as before ...
+# ... We flip them horizontally around point 1100,-800 (shown with the red cross)
+xschem flip 1100 -800
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_25.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Rotate in place a selected portion of the schematic</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># After selecting some objects ...
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_26.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... We rotate clockwise each object around their origins
+# the same command 'flip_in_place' is available for flipping horizontally.
+xschem rotate_in_place
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_27.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Move a wired object</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># After selecting some objects ...
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_28.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... we select only the first segments attached to their pins ...
+xschem connected_nets 2
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_29.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... And then move the selection.
+xschem move_objects 100 0
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_30.png"></td></tr>
+
+ </table><br>
+
+
+ <li> <h3>Add and wire parallel devices</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># Given this instance ...
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_31.png"></td></tr>
+
+ <tr><td>
+        <pre class="code"># ... The following commands will copy-paste the object and move it 
+# using the "connect by kissing" feature: when separating connected
+#  instances a wire is added.
+xschem select instance Q1
+xschem copy
+xschem paste 0 0
+xschem move_objects 120 0 kissing
+xschem unselect_all
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_32.png"></td></tr>
+ </table><br>
+
+
+ <li> <h3>Replace symbols</h3><br></li>
+ <table style="width:95%;">
+ <tr><td>
+        <pre class="code"># In the following schematic we want to replace the nfet3/pfet3 with nfet and pfet
+# that have the bulk connection pin.
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_33.png"></td></tr>
+
+ <tr><td>
+        <pre class="code">
+# select all instances that match "fet_01v8" model name
+xschem search regex 1 model {fet_01v8}
+set f {}
+foreach i [xschem selected_set] {
+  # Replace fet3 with fet in symbol reference
+  set newname [regsub {fet3} [xschem getprop instance $i cell::name] {fet}]
+  xschem replace_symbol $i $newname $f
+  # remove body attribute since it is now assigned to the bulk pin
+  xschem setprop instance $i body fast
+  # the f parameter is for optimzing (avoid pushing undo at each iteration)
+  set f fast
+}
+xschem unselect_all
+xschem redraw
+</pre>
+     </td></tr>
+     <tr><td><img src="developer_info_34.png"></td></tr>
+ </table><br>
+
+
+
+
+
+ </ul>
+
  <!-- end of slide -->
  <div class="filler"></div>
 </div>

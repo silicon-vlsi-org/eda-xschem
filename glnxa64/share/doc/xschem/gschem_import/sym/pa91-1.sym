@@ -1,14 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=PA91
-template="device=PA91
-description=\\"APEX PA91 High Voltage Amplifier\\"
-slot=1
-documentation=http://eportal.apexmicrotech.com/mainsite/pdf/pa91u.pdf
-footprint=SIP02
-name=U?
-symversion=0.1
-numslots=0
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=PA91
+template="device=PA91 description=\\"APEX PA91 High Voltage Amplifier\\" slot=1 documentation=http://eportal.apexmicrotech.com/mainsite/pdf/pa91u.pdf footprint=SIP02 name=U? symversion=0.1 numslots=0 "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -16,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

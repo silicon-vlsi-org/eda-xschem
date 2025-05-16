@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MAX7852
-template="footprint=QFP64
-name=U?
-numslots=0
-device=MAX7852
-description=\\"flash-programmable 12-bit integrated data-acquisition system\\"
-documentation=http://pdfserv.maxim-ic.com/en/ds/MAX7651-MAX7652.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MAX7852
+template="footprint=QFP64 name=U? numslots=0 device=MAX7852 description=\\"flash-programmable 12-bit integrated data-acquisition system\\" documentation=http://pdfserv.maxim-ic.com/en/ds/MAX7651-MAX7652.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -14,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

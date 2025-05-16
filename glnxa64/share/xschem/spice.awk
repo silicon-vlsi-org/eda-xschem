@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -27,8 +27,18 @@ BEGIN{
  first=1
  user_code=0 #20180129
 
- while( ARGV[1] ~ /^[-]/) {
-   if(ARGV[1] == "-hspice") hspice = 1
+ # used to handle strange primitives that have a type word before the instance name
+ special_devs["ymemristor"] = 1
+ special_devs["ylin"] = 1
+ special_devs["ydelay"] = 1
+ special_devs["ytransline"] = 1
+ special_devs["ypgbr"] = 1
+ special_devs["ypowergridbranch"] = 1
+ special_devs["yacc"] = 1
+ special_devs[".model"] = 1
+ special_devs[".subckt"] = 1
+
+ while( (ARGV[1] ~ /^[-]/) || (ARGV[1] ~ /^$/) ) {
    if(ARGV[1] == "-xyce") { xyce = 1} 
    for(i=2; i<= ARGC;i++) {
      ARGV[i-1] = ARGV[i]
@@ -39,7 +49,11 @@ BEGIN{
 
 # join split lines
 {
-  if($0 ~ /^[+]/) {
+
+  if($0 ~ /^\*\*\*\* begin user (architecture|header) code/) {
+     user_code = 1
+  }
+  if($0 ~ /^[+]/ && !user_code) {
     yy = yy " " substr($0,2)
     next
   }
@@ -53,9 +67,13 @@ BEGIN{
     }
     line[lines++] = $0
   }
+  if($0 ~ /^\*\*\*\* end user (architecture|header) code/) {
+    user_code = 0
+  }
 }
 
 END{
+  user_code = 0
   $0=yy
   line[lines++] = $0
 
@@ -68,11 +86,10 @@ END{
     ## /place to insert processing awk hooks
     if(xyce == 1) {
       ## transform ".save" lines into ".print tran" *only* for spice_probe elements, not user code
-      if(tolower($0) ~/^[ \t]*\.save[ \t]+.*\?[0-9]+/) {   # .save file=test1.raw format=raw v( ?1 C2  )
+      if(tolower($0) ~/^[ \t]*\.save[ \t]+.*\?-?[0-9]+/) {   # .save file=test1.raw format=raw v( ?1 C2  )
         $1 = ""
-        if(tolower($2) == "tran") $2 = ""
-        $0 = ".print tran" $0
-      }
+        $0 = ".print " $0
+      } 
       gsub(/ [mM] *= *1 *$/,"") # xyce does not like m=# fields (multiplicity) removing m=1 is no an issue anyway
     }
     process()
@@ -130,7 +147,7 @@ function sign(x)
   return x<0 ? -1 : x>0 ? 1 : 0
 }
 
-function process(        i, iprefix)
+function process(        i,j, iprefix, saveinstr, savetype, saveanalysis)
 {
 
   if($0 ~/\*\*\*\* end_element/){
@@ -141,6 +158,10 @@ function process(        i, iprefix)
     spiceprefix=$3
     return
   }
+  if($0 ~/\*\*\*\* begin user header code/){ #20180129
+    user_code=1
+    return
+  }
   if($0 ~/\*\*\*\* begin user architecture code/){ #20180129
     user_code=1
     print
@@ -149,6 +170,10 @@ function process(        i, iprefix)
   if($0 ~/\*\*\*\* end user architecture code/){ #20180129
     user_code=0
     print
+    return
+  }
+  if($0 ~/\*\*\*\* end user header code/){ #20180129
+    user_code=0
     return
   }
   if(user_code) { #20180129
@@ -177,6 +202,10 @@ function process(        i, iprefix)
  # dxm6[0] 0 HDD dnwell area='(50u + 73u)*(10u + 32u)' pj='2*(50u +73u)+2*(10u +32u)' 
  #20151027 do this for all fields
  for(i=1; i<=NF;i++) {
+   
+   if($i ~/^##[a-zA-Z_]+/) {
+     sub(/^##/, "", $i)
+   } else 
    if($i ~/^#[a-zA-Z_0-9]+#[a-zA-Z_]+/) {
      iprefix=$i
      sub(/^#/,"",iprefix)
@@ -190,105 +219,84 @@ function process(        i, iprefix)
      $0 = $0  # reparse input line 
    }
  }
- if(hspice) {
-   ## 20140506 do not transform {} of variation groups
-   ## nmos N {
-   ## ...
-   ## }
-   if($0 ~ /=/) gsub(/[{}]/,"'")
-   gsub(/PARAM:/,"")     # stefan 20110627
+ ## 20140506 do not transform {} of variation groups
+ ## nmos N {
+ ## ...
+ ## }
+ gsub(/PARAM:/,"")     # stefan 20110627
 
-   if($0 ~/^[gG]/) {
-     IGNORECASE=1
-     sub(/ value=/," cur=")
-     IGNORECASE=0
-   }
-   if($0 ~/^[eE]/) {
-     IGNORECASE=1
-     sub(/ value=/," vol=")
-     IGNORECASE=0
-   }
-   if($0 ~/^[rR]/) {
-     IGNORECASE=1
-     sub(/ value=/," r=")
-     IGNORECASE=0
-   }
-   if($0 ~/^[cC]/) {
-     IGNORECASE=1
-     sub(/ value=/," c=")
-     IGNORECASE=0
-   }
-   gsub(/ value=/," ")
-   gsub(/ VALUE=/," ")
-   if($0 ~ /^D/ ) sub(/PERI[ \t]*=/,"PJ=")
+ if($0 ~/^[gG]/) {
+   IGNORECASE=1
+   sub(/ value=/," cur=")
+   IGNORECASE=0
  }
+ if($0 ~/^[eE]/) {
+   IGNORECASE=1
+   sub(/ value=/," vol=")
+   IGNORECASE=0
+ }
+ if($0 ~/^[rR]/) {
+   IGNORECASE=1
+   sub(/ value=/," r=")
+   IGNORECASE=0
+ }
+ if($0 ~/^[cC]/) {
+   IGNORECASE=1
+   sub(/ value=/," c=")
+   IGNORECASE=0
+ }
+ ### ?? too dangerous 
+ # gsub(/ value=/," ")
+ # gsub(/ VALUE=/," ")
 
- # Xyce
- # .print tran v( ?1 DL[3],DL[2],DL[1],DL[0] , ?1 WL[3],WL{2],WL[1],WL[0] )
- #                        ............          .......... --> matches ?n and ?-n
- if(tolower($1) ==".print" && $4 ~/^\?-?[0-9]+$/ && $7 ~/^\?-?[0-9]+$/ && NF==9) {
-   num1=split($5,name,",")
-   num2=split($8,name2,",")
+ if($0 ~ /^D/ ) sub(/PERI[ \t]*=/,"PJ=")
 
-   num = num1>num2? num1: num2
-   for(i=1;i<=num;i++) {
-     print $1 " " $2 " " $3 " " name[(i-1)%num1+1]  " , " name2[(i-1)%num2+1] " " $9 
+ ## .save tran v(?1 GB ) v(?1 SB )
+ ## ? may be followed by -1 in some cases
+ if(tolower($1) ~ /^\.(save|print)$/ && $0 ~/\?-?[0-9]/) {
+   $0 = tolower($0)
+   saveinstr = $1
+   if(!xyce) {
+     $1=""
+     $0 = $0 # reparse line for field splitting
+  
+     gsub(/ *\?-?[0-9]+ */, "")   # in some cases ?-1 is printed (unknow multiplicity) 
+     gsub(/\( */, "(")
+     gsub(/ *\)/, ")")
+     for(i=1; i<=NF; i++) {
+       savetype=$i; sub(/\(.*/,"", savetype)  # v(...)  --> v
+       sub(/^.*\(/,"", $i)
+       sub(/\).*/,"", $i)
+       num = split($i, name, ",")
+       for(j=1; j<= num; j++) {
+         print saveinstr " " savetype "(" name[j] ")"
+       }
+     }
    }
-
- # Ngspice
- # .save v( ?1 DL[3],DL[2],DL[1],DL[0] , ?1 WL[3],WL{2],WL[1],WL[0] )
- #                              ............          .......... --> matches ?n and ?-n
- } else if(tolower($1) ==".save" && $3 ~/^\?-?[0-9]+$/ && $6 ~/^\?-?[0-9]+$/ && NF==8) {
-   num1=split($4,name,",")
-   num2=split($7,name2,",")
-
-   num = num1>num2? num1: num2
-   for(i=1;i<=num;i++) {
-     print $1 " " $2 " " name[(i-1)%num1+1]  " , " name2[(i-1)%num2+1] " " $8
-   }
-
- # Xyce
- # .print tran v( ?1 LDY1_B[1],LDY1_B[0] )
- #                               ............ --> matches ?n and ?-n
- } else if(tolower($1) ==".print" && $4 ~/^\?-?[0-9]+$/ && NF==6) {
-   num=split($5,name,",")
-   for(i=1;i<=num;i++) {
-     print $1 " " $2 " " $3 " " name[i] " " $6
-   }
-
- # Ngspice
- # .save v( ?1 LDY1_B[1],LDY1_B[0] )
- #                              ............ --> matches ?n and ?-n
- } else if(tolower($1) ==".save" && $3 ~/^\?-?[0-9]+$/ && NF==5) {
-   num=split($4,name,",")
-   for(i=1;i<=num;i++) { 
-     print $1 " " $2 " " name[i] " " $5
-   }
-
- # .save i( v1[15],v1[14],v1[13],v1[12],v1[11],v1[10],v1[9],v1[8],v1[7],v1[6],v1[5],v1[4],v1[3],v1[2],v1[1],v1[0] )
- } else if(tolower($0) ~ /^[ \t]*\.(print|save) +.* +[ivx] *\(.*\)/) {
-   num=$0
-   sub(/.*\( */,"",num)
-   sub(/ *\).*/,"",num)
-   sub(/^\?[0-9]+/,"", num)  # .print tran file=test1.raw format=raw v(?1 C2)   <-- remove ?1
-   num=split(num,name,",")
-   num1 = $0
-   sub(/^.*save */,"",num1)
-   sub(/^.*print */,"",num1)
-   sub(/\(.*/,"(",num1)
-   for(i=1;i<=num;i++) {
-     print $1 " "  num1 name[i] ")"
-   }
+   
  } else if( $1 ~ /^\*\.(ipin|opin|iopin)/ ) {
    num=split($2,name,",")
    for(i=1;i<=num;i++) print $1 " " name[i]
- } else if(  $1 ~ /\.subckt/) {
+ } else if(  tolower($1) ~ /\.subckt/) {
   # remove m=.. from subcircuit definition since m= is a multiplier not a param
   sub(/ m=[0-9]+/," ",$0)
   gsub(","," ",$0)
   print $0
  } else {
-  num=split($1,name,",")
+  # handle uncommon primitives that have a prefix before the device name
+  if(tolower($1) in special_devs) { 
+    devprefix = $1
+    num = split($3, name, ",")
+    $1 = ""
+    for(i = 0; i < num; i++) {
+      if(i) $1 = $1 ","
+      $1 = $1 devprefix
+    }
+    num = split($1, name, ",")
+    $0 = $0
+  } else {
+    num = split($1, name, ",")
+  }
   if(num==0) print ""
 
  

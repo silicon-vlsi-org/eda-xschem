@@ -73,7 +73,7 @@ name="mchanged_name" model=\"nmos\" w="20u" l="3u" m="10"
     else, provided the names are different. XSCHEM enforces this, 
     unless <kbd>Options -&gt; allow duplicated instance names</kbd> is set. If a name is given that already
     exist in the current schematic it will be renamed. Normally the template string defines a default
-    name for a given component, and expecially for SPICE compatibility, the first character must NOT 
+    name for a given component, and especially for SPICE compatibility, the first character must NOT 
     be changed. For example, the default name for a MOS transistor is <kbd>m1</kbd>, it can be renamed
     for example to <kbd>mcurr_source</kbd> but not for example to <kbd>dcurr_source</kbd>. XSCHEM 
     does not enforce that the first character is preserved, it's up to the designer to keep it 
@@ -94,7 +94,7 @@ name="mchanged_name" model=\"nmos\" w="20u" l="3u" m="10"
   </p>
   <li><kbd>url</kbd></li>
   <p> This attribute defines a location (web page, file) that can be viewed when hitting the
-    <kbd>&lt;shift&gt;H</kbd> key (or <kbd>&lt;Alt&gt; left mouse buttoni</kbd>) on a selected component. 
+    <kbd>&lt;shift&gt;H</kbd> key (or <kbd>&lt;Alt&gt; left mouse button</kbd>) on a selected component. 
     This is very useful to link a datasheet to a
     component, for example. The default program used to open the url is <kbd>xdg-open</kbd>. 
     this can be changed in the <kbd>~/xschemrc</kbd> configuration file with the <kbd>launcher_default_program</kbd>
@@ -113,32 +113,110 @@ name="mchanged_name" model=\"nmos\" w="20u" l="3u" m="10"
   <img src="component_properties3.png">
   <li><kbd>only_toplevel</kbd></li>
   <p>this attribute is valid only on <kbd>netlist_commands</kbd> type symbols and specifies that the 
-    symbol should be netlisted only if it is instantiated in the top-most hierarchy. This is very usefull
+    symbol should be netlisted only if it is instantiated in the top-most hierarchy. This is very useful
     for spice commands. Spice commands are placed in a special <kbd>netlist</kbd> component as we will see
-    and are meaningfull only when simulating the block, but should be skipped if the component
+    and are meaningful only when simulating the block, but should be skipped if the component
     is simulated as part of a bigger system which has its own (at higher hierarchy level)
     <kbd>netlist</kbd>component for Spice commands.</p>
   <img src="component_properties0.png">
+  <li><kbd>global</kbd></li>
+  <p> A <kbd>global=true</kbd> attribute on instances of <kbd>label</kbd> type symbols (like
+      <kbd>lab_pin.sym</kbd>, <kbd>lab_net.sym</kbd>, <kbd>vdd.sym</kbd>, <kbd>gnd.sym</kbd>)
+      will set the specified node to global in SPICE netlists, adding a <kbd>.GLOBAL</kbd> statement line for the node.
+      This will override symbol <kbd>global=...</kbd> setting if any.</p>
   <li><kbd>lock</kbd></li>
   <p> A <kbd>lock=true</kbd> attribute will make the symbol not editable. the only way to make it editable again is 
-      to right click on it to bring up the edit attributes dialog box and set to false. This is useful for title
+      to double click on it to bring up the edit attributes dialog box and set to false. This is useful for title
       symbols. </p>
+  <li><kbd>hide</kbd></li>
+  <p> A <kbd>hide=true</kbd> attribute will only display the symbol bounding box.</p>
+  <li><kbd>hide_texts</kbd></li>
+  <p> A <kbd>hide_texts=true</kbd> attribute will hide all symbol texts.</p>
+  <li><kbd>text_size_&lt;n&gt;</kbd></li>
+  <p> This attribute sets the size of symbol text item number <kbd>n</kbd>. This allows
+   instance based symbol text sizing.</p>
+  <li><kbd>text_layer_&lt;n&gt;</kbd></li>
+  <p> This attribute sets the layer of symbol text item number <kbd>n</kbd>. This allows
+   instance based symbol text color customization.</p>
+  <li><kbd>attach</kbd></li>
+  <p> An attribute <kbd>attach="x1 g3 p4"</kbd> will "attach" specified objects that have a matching <kbd>name=...</kbd>
+   attribute. These objects can be any xschem objects, like other elements, wires, rectangles, polygons, texts etc.<br>
+   Attached objects will be selected when selecting the component with this attribute set.
+   This allows to create "object groups"</p>
   <li><kbd>highlight</kbd></li>
   <p>If set to <kbd>true</kbd> the symbol will be highlighted when one of the nets attached to its pins are highlighted.</p>
   <li><kbd>net_name</kbd></li>
   <p>If set to <kbd>true</kbd> the <kbd>#n:net_name</kbd> symbol attributes will display the net names attached to pin terminals.
      the <kbd>n</kbd> is a pin number or name.</p>
   <li><kbd>place</kbd></li>
-  <p> This 
-    <kbd>place=end</kbd> attribute is only valid only for <kbd>netlist_commands</kbd> type symbols, and tells
+  <p>The <kbd>place=end</kbd> attribute is only valid only for <kbd>netlist_commands</kbd> type symbols, and tells
     XSCHEM that this component must be netlisted last. This is necessary for some spice commands 
     that need to be placed <b>after</b> the rest of the netlist.</p>
+  <p>The <kbd>place=header</kbd> attribute is only valid only for <kbd>netlist_commands</kbd> type symbols 
+     and spice netlisting mode, it tells XSCHEM that this component must be netlisted in the very first
+     part of a spice netlist. This is necessary for some spice commands 
+     that need to be placed <b>before</b> the rest of the netlist.</p>
+
+  <li id="spice_ignore"><kbd>vhdl_ignore</kbd></li>
   <li><kbd>spice_ignore</kbd></li>
-  <p> This tells XSCHEM that for SPICE netlist this component will be <b>completely</b> ignored.</p>
   <li><kbd>verilog_ignore</kbd></li>
-  <p> This tells XSCHEM that for Verilog netlist this component will be <b>completely</b> ignored.</p>
-  <li><kbd>vhdl_ignore</kbd></li>
-  <p> This tells XSCHEM that for VHDL netlist this component will be <b>completely</b> ignored.</p>
+  <li><kbd>tedax_ignore</kbd></li>
+  <p >These 4 attributes tell XSCHEM to ignore completely the instance in the respective netlist formats.
+    Allowed values for these attributes are <kbd>true</kbd> (or <kbd>open</kbd>), <kbd>false</kbd> and
+    <kbd>short</kbd>
+    If <kbd>short</kbd> is specified the instance will short together all its pins. For this to work
+    only one of the nets connected to the symbol may have a net label attached to it. All other nets will take this name.
+    If more labeled nets connect to the shorted symbol a net short error is reported.
+    Shorted instances are displayed in the pin color (red) layer. See in below image the upper netname of R1
+    is <kbd>VDD</kbd>. </p>
+  <img src="component_properties4.png">
+  <p> Disabled components (<kbd>spice_ignore=true</kbd> or <kbd>spice_ignore=open</kbd>) are displayed in grey.</p>
+  <img src="component_properties5.png">
+
+  <li><kbd>lvs_ignore</kbd></li>
+  <p> This attribute works in the same way as above attributes, may take the values 
+   <kbd>true</kbd> (or <kbd>open</kbd>), <kbd>false</kbd> or <kbd>short</kbd>, and
+   will affect the specific instance behaviour in the same way, but only if tcl variable
+   <kbd>lvs_ignore</kbd> is set to <kbd>1</kbd>. This can be done in the Simulation menu:
+   <kbd>Set 'lvs_ignore' variable</kbd>. If this <kbd>lvs_ignore</kbd> is set on the instance
+   it will be shorted / ignored or kept as is depending on its <kbd>lvs_ignore</kbd> attribute
+   and will be effective in all netlisting formats. This is mostly used to modify the produced netlist
+   automatically when doing schematic vs layout (LVS) comparison.</p>
+
+  <p> By using the <kbd>*_ignore</kbd> attributes you can modify the circuit depending on the value of a tcl variable:</p>
+  <img src="component_properties6.png">
+  <p> just set the attribute to something like:</p>
+  <pre class="code"> spice_ignore="tcleval([if {$IGNORE == 1} {return {true}} else {return {false}}])" </pre>
+  <p> or:</p>
+  <pre class="code"> spice_ignore="tcleval([if {$IGNORE == 1} {return {short}} else {return {false}}])" </pre><br>
+
+  <li><kbd>spice_sym_def</kbd></li>
+  <li><kbd>verilog_sym_def</kbd></li>
+  <li><kbd>vhdl_sym_def</kbd></li>
+  <p> If any of these attributes are present and not empty and the symbol type is set to <kbd>subcircuit</kbd>
+   the corresponding netlister will ignore the schematic subcircuit for this specific instance
+   and dump into the netlist the content of this attribute.
+   This attribute must be paired with a <kbd>schematic=...</kbd> attribute set on the instance that tells
+   the subcircuit name to use for this particular instance.
+   The typical usage is to include a file, example:<br>
+  <pre class="code">
+    verilog_sym_def="tcleval(`include \"[abs_sym_path verilog_include_file.v]\")"
+  </pre>
+  </p> 
+  <p>
+   In this example a <kbd>verilog_include_file.v</kbd> is included using the verilog <kbd>`include</kbd> directive.
+   In order to generate a full path for it the <kbd>abs_sym_path</kbd> TCL function is used that searches for this file
+   in any of the <kbd>XCHEM_LIBRARY_PATH</kbd> directories. Since TCL is used the attribute is wrapped into a tcleval(...),<br>
+   The following will appear in the generated netlist:
+   <pre class="code">
+// expanding   symbol:  verilog_include.sym # of pins=3 
+// sym_path: /home/schippes/.xschem/xschem_library/verilog_include.sym
+`include "/home/schippes/.xschem/xschem_library/verilog_include_file.v"
+   </pre>
+  </p>
+
+
+
   <li><kbd>sig_type</kbd></li>
   <p> For VHDL type netlist, this tells that the current label names a signal (or constant) of
     type <kbd>sig_type</kbd>. For example a label can be placed with name <kbd>TEST</kbd> and 
@@ -173,6 +251,16 @@ name="mchanged_name" model=\"nmos\" w="20u" l="3u" m="10"
    in the symbol if any.
   </p>
 
+  <li><kbd>schematic</kbd></li>
+  <p>
+   This attribute specifies an alternate schematic file to open when descending into the subcircuit.
+   This is done only for the specific instance allowing to differentiate implementation ona specific
+   instance of a given subcircuit.
+   The specified schematic must have the same interface (in/out/inout pins) as the base schematic (that
+   is inferred from the symbol name).<br>
+   Example: <kbd>schematic=sky130_tests/inv2.sch</kbd>
+  </p>
+
   <li><kbd>pinnumber(name)</kbd></li>
   <p> This will override at instance level the value of attribute <kbd>pinnumber</kbd> of pin <kbd>name</kbd> of the symbol.
       This is mainly used for tedax, where by back annotation a connection to a symbol must be changed.</p>
@@ -180,7 +268,24 @@ name="mchanged_name" model=\"nmos\" w="20u" l="3u" m="10"
   <p> This will override at instance level the value of attribute <kbd>pinnumber</kbd> of <kbd>index</kbd>th pin of the symbol.
       This is mainly used for tedax, where by back annotation a connection to a symbol must be changed.
       This notation is faster since xschem does not have to find a pin by string matching.</p>
+
+  <li><kbd>pin_attr(name|index)</kbd></li>
+  <p> This is a general mechanism where at instance level a pin attribute may be overridden for netlisting. Example:<br>
+      <kbd> sig_type(OUT)=bit_vector</kbd> (set VHDL type of pin OUT to bit_vector).</p>
  </ul><br>
+
+ <h3>TCL ATTRIBUTE SUBSTITUTION</h3>
+
+  <p>
+   Any attribute and symbol text can be embedded in a <kbd>tcleval(....)</kbd> construct, the string inside the
+   parentheses will be passed to the tcl interpreter for evaluation. This allows to use any tcl 
+   variable/command/expression. Example: <br>
+  <kbd>value="tcleval([expr {[info exists ::resval] ? $::resval : {100k}}])"</kbd><br>
+  this attribute will set <kbd>value</kbd> (example: value of a resistor) to 100k if global tcl variable
+  <kbd>resval</kbd> is not set or to the value of <kbd>resval</kbd> if set.
+  </p>
+
+
  <!-- end of slide -->
  <div class="filler"></div>
 </div>

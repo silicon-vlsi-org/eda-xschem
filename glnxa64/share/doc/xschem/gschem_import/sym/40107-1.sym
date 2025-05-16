@@ -1,13 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=40107
-template="device=40107
-numslots=2
-slot=1
-footprint=DIP8
-description=\\"Dual 2-input open-collector NAND gates with buffered output\\"
-name=U?
-symversion=1.0
-VDD=VDD
+v {xschem version=3.0.0 file_version=1.2}
+K {type=40107
+template="device=40107 numslots=2 slot=1 footprint=DIP8 description=\\"Dual 2-input open-collector NAND gates with buffered output\\" name=U? symversion=1.0 VDD=VDD
 VSS=VSS
 "
 tedax_format="footprint @name @footprint
@@ -19,6 +12,7 @@ format="@name @pinlist @value @VDD @VSS"
 extra="VDD VSS"
 extra_pinnumber="8 4"
 }
+G {}
 V {}
 S {}
 E {}

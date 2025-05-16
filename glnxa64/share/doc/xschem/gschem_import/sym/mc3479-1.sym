@@ -1,13 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MC3479
-template="device=MC3479
-name=U?
-description=\\"Stepper motor controler\\"
-author=\\"Take Vos Take.Vos@vosgames.nl\\"
-numslots=0
-footprint=DIP16
-documentation=http://www.leang.com/pat/umouse/datasheets/mc3479.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MC3479
+template="device=MC3479 name=U? description=\\"Stepper motor controler\\" author=\\"Take Vos Take.Vos@vosgames.nl\\" numslots=0 footprint=DIP16 documentation=http://www.leang.com/pat/umouse/datasheets/mc3479.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -15,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}
@@ -84,7 +78,7 @@ L 3 0 -150 30 -150 {}
 B 5 -2.5 -152.5 2.5 -147.5 {pinnumber=7
 pinseq=7
 name=CLOCK
-dir=inout
+dir=in
 }
 T {@#6:pinnumber} 9.6 -156.5 2 1 0.266667 0.266667 {layer=13}
 T {@#6:name} 40 -150 2 1 0.266667 0.266667 {}

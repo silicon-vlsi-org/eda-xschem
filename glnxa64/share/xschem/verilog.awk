@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,15 @@
 
 
 BEGIN{
+ bitblast = 0
+ while( (ARGV[1] ~ /^[-]/) || (ARGV[1] ~ /^$/) ) {
+   if(ARGV[1] == "-bitblast") bitblast = 1
+   for(i=2; i<= ARGC;i++) {
+     ARGV[i-1] = ARGV[i]
+   }
+   ARGC--
+ }
+
  net_types["wire"]=1
  net_types["tri"]=1
  net_types["wor"]=1
@@ -38,6 +47,7 @@ BEGIN{
  net_types["integer"]=1
  net_types["time"]=1
  net_types["real"]=1
+ net_types["signed"]=1
  net_types["logic"]=1
  net_types["bool"]=1
  direction["input"]=1
@@ -51,6 +61,7 @@ BEGIN{
   $0 = primitive_line
   gsub(/----pin\(/, " ----pin(",$0)
   gsub(/----name\(/, " ----name(",$0)
+  split($0, primitive_line_sep,  /[^ \n\t]+/)
   for(j=1;j<= primitive_mult; j++) {
     prefix=""
     # print $0 > "/dev/stderr"
@@ -79,13 +90,14 @@ BEGIN{
               printf "%s", prefix prim_field_array[s]
               if(s<pport_mult) printf ","
             }
-            printf "} "
+            printf "}%s", primitive_line_sep[i+1]
          }
         } 
         else 
         # 20060919 end
 
-        printf "%s ", prim_field_array[1+(j-1) % pport_mult]   #  20140401 1+(j-1) % pport_mult instead of j
+        printf "%s", prim_field_array[1+(j-1) % pport_mult]   #  20140401 1+(j-1) % pport_mult instead of j
+        printf "%s", primitive_line_sep[i+1]
       }
       else if($i ~ /^----name\(.*\)/) {
         sub(/----name\(/,"",prim_field)
@@ -94,9 +106,11 @@ BEGIN{
         split(prim_field, prim_field_array,/,/)
         sub(/\[/,"_", prim_field_array[j])
         sub(/\]/,"", prim_field_array[j])
-        printf "%s ", prefix prim_field_array[j]
+        printf "%s%s", prefix prim_field_array[j], primitive_line_sep[i+1]
       }
-      else  printf "%s ", prim_field
+      else {
+        printf "%s%s", prim_field, primitive_line_sep[i+1]
+      }
       prefix=""
     } # end for i
     printf "\n"
@@ -104,11 +118,12 @@ BEGIN{
   next
 }
 
-primitive==1{primitive_line=primitive_line " " $0; next  }
+primitive==1{primitive_line=primitive_line "\n" $0; next  }
 
 # print signals/regs/variables
 /---- end signal list/{
- for(i in signal_basename) {
+ for(ii = 0 ; ii < signal_n; ii++) { # used to preserve order of signals
+  i = signal_num[ii] # used to preserve order of signals
   n=signal_basename[i]
   split(signal_index[i],tmp)
   hsort(tmp,n)
@@ -137,7 +152,7 @@ primitive==1{primitive_line=primitive_line " " $0; next  }
     }
     printf "%s ", i
     if(i in signal_value) printf " = %s ", signal_value[i]
-    printf " ;\n"
+    printf ";\n"
   }
  }
  # /20161118
@@ -150,8 +165,7 @@ primitive==1{primitive_line=primitive_line " " $0; next  }
 
 # store signals
 siglist==1 && ($1 in net_types) {
-
-# 20070525 recognize "reg real" types and similar 
+ # 20070525 recognize "reg real", "wire signed"  types and similar 
  if($2 in net_types) {
    if($3 ~ /^#/) basename=s_b($4)
    else basename=s_b($3)
@@ -166,20 +180,19 @@ siglist==1 && ($1 in net_types) {
     sub(/;.*/,"",val)
     signal_value[basename]=val
    }
+   if(!(basename in signal_basename)) signal_num[signal_n++] = basename # used to preserve order of signals
    signal_basename[basename]++
    if($3 ~ /\[.*\]/) {
     signal_index[basename]=signal_index[basename] " " s_i($3)
    }
    else signal_index[basename]="no_index"
-
  }
-# /20070525
-
+ # /20070525
  else {
    if($2 ~ /^#/) basename=s_b($3)
    else basename=s_b($2)
    signal_type[basename]=$1
-   if($2 ~ /^#/) {
+   if($2 ~ /^#/) {     # handle declarations like: wire #20 w_tmp;
     signal_delay[basename]=$2
     $2=""; $0=$0;
    }
@@ -189,6 +202,7 @@ siglist==1 && ($1 in net_types) {
     sub(/;.*/,"",val) 
     signal_value[basename]=val
    }
+   if(!(basename in signal_basename)) signal_num[signal_n++] = basename # used to preserve order of signals
    signal_basename[basename]++
    if($2 ~ /\[.*\]/) {
     signal_index[basename]=signal_index[basename] " " s_i($2)
@@ -216,6 +230,8 @@ NF==3 && $3=="(" && $1=="module" {
  delete signal_value
  delete signal_type
  delete signal_delay
+ delete signal_num # used to preserve order of signals
+ signal_n = 0 # used to preserve order of signals
 }
 
 begin_module && $1 ~/^\);$/ {
@@ -265,15 +281,21 @@ begin_module && $1 ~/^\);$/ {
     }
     if(nmult==1) printf "\n .%s( %s )" ,s_b($(j-1)),pin
     else {
-     split(pin,pin_array,",")
-     basename=s_b(pin_array[1])
-     if(check2(pin_array,nmult) && net_ascending==0) {  ## 20140416 if ascending nets print single bits
-      if(nmult==signal_basename[basename] )
-        printf "\n .%s( %s )", s_b($(j-1)),basename
-      else
-        printf "\n .%s( %s[%s:%s] )",s_b($(j-1)),basename,s_i(pin_array[1]),s_i(pin_array[nmult])
-     }
-     else printf "\n .%s( %s )", s_b($(j-1)), (nmult>1? "{" pin "}" : pin)
+      # old code
+      if(!bitblast) {
+        split(pin,pin_array,",")
+        basename=s_b(pin_array[1])
+        if(check2(pin_array,nmult) && net_ascending==0) {  ## 20140416 if ascending nets print single bits
+         if(nmult==signal_basename[basename] )
+           printf "\n .%s( %s )", s_b($(j-1)),basename
+         else
+           printf "\n .%s( %s[%s:%s] )",s_b($(j-1)),basename,s_i(pin_array[1]),s_i(pin_array[nmult])
+        }
+        else printf "\n .%s( %s )", s_b($(j-1)), (nmult>1? "{" pin "}" : pin)
+      # new code
+      } else {
+        printf "\n .%s( %s )" ,s_b($(j-1)),compact_label(pin)
+      }
     }
    }
    printf "\n);\n\n"
@@ -459,6 +481,68 @@ function check(arr,n      ,i,start,ok)
  }
  return 1
 }
+
+
+# globals: newlab, startbus, startsig
+function compact_label(lab,      n, i, last, lab_array, bus_current, name, busname)
+{
+  n=split(lab,lab_array,",")
+  startbus=-1
+  startsig=-1
+  newlab=""
+  for(i=1;i<=n;i++) {
+   if(lab_array[i] ~ /\[/) {
+     bus_current=s_i(lab_array[i])
+
+     if( startsig!=-1 &&  lab_array[i] != name )
+         print_signal(name)
+     if( (startbus!=-1) && (s_b(lab_array[i]) != busname) )
+         print_bus(busname, last)
+     # 09032004 fix for errors on buses like D[5],D[4],D[2],D[1]
+     if( (startbus!=-1) && (s_b(lab_array[i]) == busname) && ((bus_current+1!=last) && (bus_current-1!=last)) )
+         print_bus(busname, last)
+
+     if(startbus==-1) { busname=s_b(lab_array[i]); startbus=bus_current; last=bus_current }
+     else if(s_b(lab_array[i])==busname && ((bus_current+1==last) || (bus_current-1==last)) ) { last=bus_current }
+
+     if( (startbus!=-1) && i==n )
+         print_bus(busname, last)
+   }
+   else {
+     if(s_b(lab_array[i]) != busname&& startbus!=-1)
+       print_bus(busname, last)
+     if( (startsig!=-1) && ( lab_array[i] != name) )
+       print_signal(name)
+
+     if(startsig==-1) { name=lab_array[i] ; startsig++ }
+     else if(lab_array[i] == name) { startsig++ }
+
+     if( (startsig!=-1) && i==n )
+       print_signal(name)
+   }
+  }
+  sub(/,$/,"",newlab)
+  if(newlab ~ /,/) newlab="{" newlab "}"
+  return newlab
+}
+
+function print_bus(busname, last) {
+   if(startbus!=last)
+       newlab=newlab busname "[" startbus ":" last "],"
+   else
+       newlab=newlab busname "[" startbus "],"
+   startbus=-1
+}
+
+function print_signal(name,       i) {
+   if(startsig>0) {
+      # newlab = newlab startsig+1 "*" name ","
+      for(i = 0; i <= startsig; i++)  newlab = newlab name ","
+   } else
+      newlab = newlab name ","
+   startsig=-1
+}
+
 
 function s_b(n)
 {

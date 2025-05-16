@@ -1,15 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MAX488
-template="device=MAX488
-comment=\\"E suffix is Electrostatic protected to 15 kV\\"
-comment=\\"MAX490 is high speed version\\"
-name=U?
-footprint=SO8
-footprint2=DIP8
-description=\\"low-power, slew-rat-limited RS-485/RS422 transceiver\\"
-numslots=0
-documentation=http://pdfserv.maxim-ic.com/en/ds/MAX1487-MAX491.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MAX488
+template="device=MAX488 comment=\\"E suffix is Electrostatic protected to 15 kV\\" comment=\\"MAX490 is high speed version\\" name=U? footprint=SO8 footprint2=DIP8 description=\\"low-power, slew-rat-limited RS-485/RS422 transceiver\\" numslots=0 documentation=http://pdfserv.maxim-ic.com/en/ds/MAX1487-MAX491.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -17,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}
@@ -66,7 +58,7 @@ pinnumber=1
 pinseq=1
 dir=inout
 }
-T {@#0:name} 66.4 -215 0 0 0.266667 0.266667 {}
+T {@#0:name} 80 -215 0 0 0.266667 0.266667 { hcenter=true}
 T {@#0:pinnumber} 85 -230 2 1 0.266667 0.266667 {layer=13}
 L 3 0 -120 30 -120 {}
 B 5 -2.5 -122.5 2.5 -117.5 {pinnumber=2
@@ -90,7 +82,7 @@ pinnumber=4
 pinseq=4
 dir=inout
 }
-T {@#3:name} 66.4 -85 2 1 0.266667 0.266667 {}
+T {@#3:name} 80 -85 2 1 0.266667 0.266667 { hcenter=true}
 T {@#3:pinnumber} 85 -50 2 1 0.266667 0.266667 {layer=13}
 L 3 120 -200 150 -200 {}
 B 5 147.5 -202.5 152.5 -197.5 {pinnumber=5

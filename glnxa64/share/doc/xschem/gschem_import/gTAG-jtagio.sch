@@ -1,4 +1,25 @@
-v {xschem version=2.9.7 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {}
 G {}
 V {}
 S {}
@@ -127,24 +148,24 @@ N 5500 -5220 5690 -5220 {}
 N 5420 -5530 5560 -5530 {}
 N 5560 -5530 5560 -5250 {}
 N 5560 -5250 5690 -5250 {}
-N 5690 -5160 5500 -5160 {}
+N 5500 -5160 5690 -5160 {}
 N 5500 -5160 5500 -5020 {}
-N 5500 -5020 5420 -5020 {}
-N 5690 -5130 5560 -5130 {}
+N 5420 -5020 5500 -5020 {}
+N 5560 -5130 5690 -5130 {}
 N 5560 -5130 5560 -4850 {}
-N 5560 -4850 5420 -4850 {}
-N 5690 -5100 5620 -5100 {}
+N 5420 -4850 5560 -4850 {}
+N 5620 -5100 5690 -5100 {}
 N 5620 -5100 5620 -5050 {}
-N 5690 -5280 5620 -5280 {}
-N 5620 -5280 5620 -5610 {}
-N 5620 -5610 4600 -5610 {}
+N 5620 -5280 5690 -5280 {}
+N 5620 -5610 5620 -5280 {}
+N 4600 -5610 5620 -5610 {}
 N 4600 -5530 5300 -5530 {}
 N 4600 -5370 5300 -5370 {}
 N 4600 -5190 5300 -5190 {}
 N 4600 -5020 5300 -5020 {}
 N 4600 -4850 5300 -4850 {}
-N 5900 -5720 5900 -5760 {}
-N 5900 -5590 5900 -5630 {}
+N 5900 -5760 5900 -5720 {}
+N 5900 -5630 5900 -5590 {}
 N 4740 -5670 4740 -4850 {}
 N 4870 -5670 4870 -5020 {}
 N 5000 -5670 5000 -5190 {}

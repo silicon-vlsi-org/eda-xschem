@@ -1,27 +1,52 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=model
-template="device=model
-name=A?
-model-name=unknown
-file=unknown
-"
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {type=model
+template="device=model name=A? model-name=unknown file=unknown "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
 @comptag"
-format=".include @file"
+format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}
-L 4 0 -60 180 -60 {}
-L 4 180 -100 180 -60 {}
-L 4 0 -100 180 -100 {}
-L 4 0 -100 0 -60 {}
-T {@name} 10 -88.33329999999999 0 0 0.333333 0.333333 {}
-T {SPICE model} 50 -88.33329999999999 0 0 0.333333 0.333333 {}
+T {@name} 10 -80 0 0 0.333333 0.333333 { vcenter=true}
+T {SPICE model} 50 -80 0 0 0.333333 0.333333 { vcenter=true}
 T {Model name:} 10 -50 0 0 0.333333 0.333333 {}
 T {File:} 10 -20 0 0 0.333333 0.333333 {}
 T {@model-name} 130 -50 0 0 0.333333 0.333333 {}
 T {@file} 50 -20 0 0 0.333333 0.333333 {}
+
+L 4 0 -60 180 -60 {}
+L 4 180 -100 180 -60 {}
+L 4 0 -100 180 -100 {}
+L 4 0 -100 0 -60 {}
+
+
+
+
+
+
+

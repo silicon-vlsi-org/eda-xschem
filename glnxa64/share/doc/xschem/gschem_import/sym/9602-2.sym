@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=9602
-template="name=U?
-device=9602
-numslots=2
-slot=1
-footprint=DIP16
-description=\\"2 retriggerable, resetable monoflops\\"
-Vcc=Vcc
+v {xschem version=3.0.0 file_version=1.2}
+K {type=9602
+template="name=U? device=9602 numslots=2 slot=1 footprint=DIP16 description=\\"2 retriggerable, resetable monoflops\\" Vcc=Vcc
 GND=GND
 "
 tedax_format="footprint @name @footprint
@@ -18,6 +12,7 @@ format="@name @pinlist @value @Vcc @GND"
 extra="Vcc GND"
 extra_pinnumber="16 8"
 }
+G {}
 V {}
 S {}
 E {}

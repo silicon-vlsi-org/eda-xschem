@@ -1,10 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=HEADER26
-template="name=J?
-device=HEADER26
-class=IO
-pins=26
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=HEADER26
+template="name=J? device=HEADER26 class=IO pins=26 "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -12,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

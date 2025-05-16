@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=pic16F876
-template="name=U?
-device=pic16F876
-footprint=DIP28
-description=\\"8-bit CMOS FLASH microcontroller\\"
-numslots=0
-documentation=http://ww1.microchip.com/downloads/en/DeviceDoc/39582b.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=pic16F876
+template="name=U? device=pic16F876 footprint=DIP28 description=\\"8-bit CMOS FLASH microcontroller\\" numslots=0 documentation=http://ww1.microchip.com/downloads/en/DeviceDoc/39582b.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -14,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

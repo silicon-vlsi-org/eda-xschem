@@ -1,27 +1,61 @@
 #!/usr/bin/awk -f
+#
+#  File: gschemtoxschem.awk
+#  
+#  This file is part of XSCHEM,
+#  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
+#  simulation.
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
+# 
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+#### Translates a geda-gschem symbol or schematic into xschem equivalent.
+#### Usage:
+####    gschemtoxschem.awk geda_file.sch > xschem_file.sch
+####    gschemtoxschem.awk geda_file.sym > xschem_file.sym
+
+#### before processing file
 BEGIN{
   halfpinsize=2.5
   ret = 1
+  debug=0 # set to 1 to print debug info to stderr
 }
 
+#### on first line 
 FNR==1{
   if(FILENAME ~/\.sym$/) is_symbol = 1
   sch = FILENAME
   sub(/\.[^.]+$/, ".sch", sch)
   if(file_exists(sch)) has_schematic = 1
+  dbg("has sch")
   pin = 0
   net_assign = 0
   pinseq=0
   max_pinseq = 0
   template_attrs=""
+  extra = extra_format = extra_pinnumber = ""
   delete slotdef
   numslots=""
 }
 
+
+#### for every line in geda sch/sym file
 {
   while(ret > 0 ) {
 
+    #### line objects
     if($0 ~ /^L/){
       x1 = $2 / 10
       y1 = $3 / 10
@@ -30,6 +64,7 @@ FNR==1{
       lines = lines  "L 4 " order(x1, y1, x2, y2) " {}\n"
     }
     
+    #### Text objects
     # T x y color size visibility show angle alignment num_lines
     # 1 2 3  4     5       6        7    8      9        10
     # show 0:show both, 1:value only 2:name only
@@ -68,7 +103,7 @@ FNR==1{
           if($0 ~/numslots=/) {
             numslots = $0
             sub(/numslots=/,"", numslots)
-            template_attrs = template_attrs $0 "\n"
+            template_attrs = template_attrs escape_chars($0) " "
             continue
           }
           if($0 ~/net=/) {
@@ -77,20 +112,31 @@ FNR==1{
             net[++net_assign] = tmp
             continue
           }
-          if(is_symbol && has_schematic) {
-            if($0 ~/name=/ && template_attrs == "") template_attrs = template_attrs escape_chars($0) "\n"
-          } else {
-            template_attrs = template_attrs escape_chars($0) "\n"
-          }
+          template_attrs = template_attrs escape_chars($0) " "
+
+
+          #### put into "extra" all attributes that are meaningless for spice netlisting
+          #### if you need other attributes to filter out , add them below.
+          #### however this will break slotted devices
+          ####
+          # if($0 ~ /^(device|description|footprint|source|numslots)=/) {
+          #   attributes = $0
+          #   sub(/=.*/, "", attributes)
+          #   if(extra !="") extra = extra " " 
+          #   if(extra_pinnumber !="") extra_pinnumber = extra_pinnumber " " 
+          #   extra = extra attributes
+          #   extra_pinnumber = extra_pinnumber "-"
+          # }
+
           save = $0
           sub(/^device=/, "type=") 
           if ($0 ~/^value=IO/) { # inconsistency in io-1.sym
             $0 = "type=IO"
           }
           if ($0 ~/^type=/) {
-            if($0 ~/=INPUT/) {pin = 1; sub(/=.*/, "=ipin"); template_attrs = template_attrs "lab=xxx\n"}
-            if($0 ~/=OUTPUT/) {pin = 1; sub(/=.*/, "=opin"); template_attrs = template_attrs "lab=xxx\n"}
-            if($0 ~/=IO/) {pin = 1; sub(/=.*/, "=iopin"); template_attrs = template_attrs "lab=xxx\n"}
+            if($0 ~/=INPUT/) {pin = 1; sub(/=.*/, "=ipin"); template_attrs = template_attrs "lab=xxx "}
+            if($0 ~/=OUTPUT/) {pin = 1; sub(/=.*/, "=opin"); template_attrs = template_attrs "lab=xxx "}
+            if($0 ~/=IO/) {pin = 1; sub(/=.*/, "=iopin"); template_attrs = template_attrs "lab=xxx "}
             if(is_symbol && has_schematic) global_attrs = "type=subcircuit\n" global_attrs
             else global_attrs = $0 "\n" global_attrs 
           }
@@ -108,10 +154,11 @@ FNR==1{
       }
       correct_align()
       if(visibility) {
-        texts = texts  "T {" text "} " xt " " (-yt) " " int(angle/90) " " flip " " size " " size " {}\n"
+        texts = texts  "T {" text "} " xt " " (-yt) " " int(angle/90) " " flip " " size " " size " {" text_align "}\n"
       }
     } 
        
+    #### box objects
     else if($0 ~ /^B/){
       x1 = $2 / 10
       y1 = $3 / 10
@@ -123,15 +170,18 @@ FNR==1{
       boxes = boxes "L 4 " x1 " " (-y2) " " x1 " " (-y1) " {}\n"
     }
     
+    #### circle objects
     else if($0 ~ /^V/){ #circle
       circles = circles "A 4 " ($2/10) " " (-$3/10) " " ($4/10) " " 0 " " 360 " {}\n"
     }
     
+    #### arc objects
     # A 1000 1000 100 90 180 3 0 0 0 -1 -1
     else if($0 ~ /^A/){ #arc
       arcs = arcs "A 4 " ($2/10) " " (-$3/10) " " ($4/10) " " ($5) " " ($6) " {}\n"
     }
     
+    #### path objects: use xschem polygon
     # H 3 0 0 0 -1 -1 1 -1 -1 -1 -1 -1 5 <--n_lines
     #path object --> simulate with polygon
     else if($0 ~ /^H/){
@@ -152,19 +202,24 @@ FNR==1{
       polys = polys "{fill=true}\n"
     }
     
+    #### net (wire) objects
     # N 39000 50400 39000 51000 4
     else if($0 ~/^N/) {
       nx1 = $2/10
       ny1 = -$3/10
       nx2 = $4/10
       ny2 = -$5/10
+      if(nx2 < nx1) {xxtmp=nx1;nx1=nx2;nx2=xxtmp;xxtmp=ny1;ny1=ny2;ny2=xxtmp}
+      else if(nx2 == nx1 && ny2 < ny1) {xxtmp=ny1;ny1=ny2;ny2=xxtmp}
+
       propstring = ""
       ret = getline
       if($0 == "{") {
         getline
         while($0 !="}") {
           if($0 ~/^T/) {
-            # do nothing for now
+            tx = $2/10
+            ty = -$3/10
           } else {
             if($0 ~/netname=/) sub(/netname=/, "lab=")
             propstring = propstring $0 " "
@@ -177,10 +232,24 @@ FNR==1{
       }
       wires = wires "N " nx1 " " ny1 " " nx2 " " ny2 " {" propstring  "}\n"
       if(propstring!="") {
-        wires = wires "C {lab_wire.sym} " (nx1+nx2)/2 " " (ny1+ny2)/2 " 0 0 {" propstring "}\n"
+
+        if(ny1 == ny2) { # horizontal wire
+          ty = ny1
+          if(tx < nx1) tx = nx1
+          if(tx > nx2) tx = nx2
+        } else if(nx1 == nx2) { # vertical line
+          tx = nx1
+          if(ty < ny1) ty = ny1
+          if(ty > ny2) ty = ny2
+        } else { # oblique line
+          tx =  (nx1+nx2)/2
+          ty = (ny1+ny2)/2
+        }
+        wires = wires "C {lab_wire.sym} " tx " " ty " 0 1 {" propstring "}\n"
       }
     }
     
+    #### component instance object
     #               selectable angle flip 
     #C 36700 54700    1         90     0   resistor-1.sym
     #component
@@ -228,8 +297,9 @@ FNR==1{
               }
               
             }
-            gsub(/ /, "\\\\ ", $0)
+            gsub(/ /, "\\\\\\\\ ", $0) # prefix spaces with double backslash
             propstring = propstring $0 "\n"
+            # print propstring > "/dev/stderr"
           }
           getline
         }
@@ -245,6 +315,7 @@ FNR==1{
       components = components  "C {" symbol "} " cx " " cy " " crot " " cflip " {" propstring "}\n"
     }
       
+    #### pin object
     # P 900 100 750 100 1 0 0
     else if($0 ~ /^P/){
       $2/=10; $3/=10; $4/=10; $5/=10
@@ -295,6 +366,7 @@ FNR==1{
               if(attr == "pintype") { 
                 found_pintype=1
                 attr = "dir"
+                if(value=="clk") value = "in"
                 if(value!="in" && value !="out") value = "inout"
               }
       
@@ -303,8 +375,8 @@ FNR==1{
                 pinseq++
                 if(value > max_pinseq) max_pinseq = value
               }
-              gsub(/\\/, "\\\\\\\\", value)
-              gsub(/ /, "\\\\ ", value)
+              gsub(/\\/, "\\\\\\\\", value) # replace single slash with double backslash. 
+              gsub(/ /, "\\\\\\\\ ", value) # prefix spaces with double backslash
               gsub(/\\_/, "_", value)
               pin_attr[pin_idx, nattr] = attr
               pin_value[pin_idx, nattr] = value
@@ -335,9 +407,9 @@ function escape_chars(s,     a, b)
   sub(/.*=/,"",b)
   if(s!~/=/) b = ""
 
-  sub(/"/, "\\\\", b)
+  sub(/"/, "\\\\\\\\", b) # prefix " with 2 backslashes
   if(b ~ / /) {
-    b = "\\\\\"" b "\\\\\""
+    b = "\\\\\"" b "\\\\\"" # escape " inside string with 2 backslashes
   }
   s = a "=" b
   return s
@@ -365,11 +437,13 @@ function print_header()
       extra_pinnumber = extra_pinnumber pinnumber 
       extra_format = extra_format "@" netname
     }
-    if(extra) {
-      extra = "extra=\"" extra "\""
-      extra_pinnumber = "extra_pinnumber=\"" extra_pinnumber "\""
-    }
  
+  }
+  if(extra) {
+    extra = "extra=\"" extra "\""
+  }
+  if(extra_pinnumber) {
+    extra_pinnumber = "extra_pinnumber=\"" extra_pinnumber "\""
   }
 
   if(pin == 1) spice_attrs = tedax_attrs="" 
@@ -387,7 +461,7 @@ function print_header()
        "device @name @device\n" \
        "@comptag\"\n"
   }
-  print "v {xschem version=2.9.9 file_version=1.2}"
+  print "v {xschem version=3.4.8RC file_version=1.2}"
   template_attrs = "template=\"" template_attrs "\"\n"
 
   if(FILENAME ~/\.sym$/) {
@@ -400,8 +474,11 @@ function print_header()
     print "K {" global_attrs template_attrs tedax_attrs spice_attrs 
     if(extra) {
       print extra
+    }
+    if(extra_pinnumber) {
       print extra_pinnumber
     }
+    dbg("extra=" extra)
     print "}"
   } else {
     print "K {}"
@@ -453,21 +530,23 @@ function alert(s)
 # |                            |
 # 0-------------3--------------6
 #
-# assumes xt, yt, angle, align, len are set globally
+# assumes xt, yt, angle, size, align, len are set globally
 # corrects angle, xt, yt, sets flip
+# sets also text_align
 function correct_align(          hcorrect, vcorrect)
 {
   hcorrect = 17
   vcorrect = 25
+  text_align=""
   if     (angle ==   0 && align == 0 ) { angle = 180; flip = 1}
   else if(angle ==  90 && align == 0 ) { angle =  90; flip = 1}
   else if(angle == 180 && align == 0 ) { angle =   0; flip = 1}
   else if(angle == 270 && align == 0 ) { angle = 270; flip = 1}
 
-  if     (angle ==   0 && align == 3 ) { angle = 180; flip = 1; xt-=size*hcorrect*len}
-  else if(angle ==  90 && align == 3 ) { angle =  90; flip = 1; yt-=size*hcorrect*len}
-  else if(angle == 180 && align == 3 ) { angle =   0; flip = 1; xt+=size*hcorrect*len}
-  else if(angle == 270 && align == 3 ) { angle = 270; flip = 1; yt+=size*hcorrect*len}
+  if     (angle ==   0 && align == 3 ) { angle = 180; flip = 1; text_align = " hcenter=true"}
+  else if(angle ==  90 && align == 3 ) { angle =  90; flip = 1; text_align = " hcenter=true"}
+  else if(angle == 180 && align == 3 ) { angle =   0; flip = 1; text_align = " hcenter=true"}
+  else if(angle == 270 && align == 3 ) { angle = 270; flip = 1; text_align = " hcenter=true"}
 
   else if(angle ==   0 && align == 6 ) { angle = 180; flip = 0}
   else if(angle ==  90 && align == 6 ) { angle =  90; flip = 0}
@@ -479,32 +558,38 @@ function correct_align(          hcorrect, vcorrect)
   else if(angle == 180 && align == 8 ) { angle = 180; flip = 1}
   else if(angle == 270 && align == 8 ) { angle =  90; flip = 1}
 
-  else if(angle ==   0 && align == 7 ) { angle =   0; flip = 1; yt+=size*vcorrect}
-  else if(angle ==  90 && align == 7 ) { angle = 270; flip = 1; xt-=size*vcorrect}
-  else if(angle == 180 && align == 7 ) { angle = 180; flip = 1; yt-=size*vcorrect}
-  else if(angle == 270 && align == 7 ) { angle =  90; flip = 1; xt+=size*vcorrect}
+  else if(angle ==   0 && align == 7 ) { angle =   0; flip = 1; text_align = " vcenter=true"}
+  else if(angle ==  90 && align == 7 ) { angle = 270; flip = 1; text_align = " vcenter=true"}
+  else if(angle == 180 && align == 7 ) { angle = 180; flip = 1; text_align = " vcenter=true"}
+  else if(angle == 270 && align == 7 ) { angle =  90; flip = 1; text_align = " vcenter=true"}
 
-  else if(angle ==   0 && align == 4 ) { angle =   0; flip = 1; yt+=size*vcorrect; xt+=size*hcorrect*len}
-  else if(angle ==  90 && align == 4 ) { angle = 270; flip = 1; xt-=size*vcorrect; yt+=size*hcorrect*len}
-  else if(angle == 180 && align == 4 ) { angle = 180; flip = 1; yt-=size*vcorrect; xt-=size*hcorrect*len}
-  else if(angle == 270 && align == 4 ) { angle =  90; flip = 1; xt+=size*vcorrect; yt-=size*hcorrect*len}
+  else if(angle ==   0 && align == 4 ) { angle =   0; flip = 1; text_align=" hcenter=true vcenter=true"}
+  else if(angle ==  90 && align == 4 ) { angle = 270; flip = 1; text_align=" hcenter=true vcenter=true"}
+  else if(angle == 180 && align == 4 ) { angle = 180; flip = 1; text_align=" hcenter=true vcenter=true"}
+  else if(angle == 270 && align == 4 ) { angle =  90; flip = 1; text_align=" hcenter=true vcenter=true"}
 
   else if(angle ==   0 && align == 2 ) { angle =   0; flip = 0}
   else if(angle ==  90 && align == 2 ) { angle = 270; flip = 0}
   else if(angle == 180 && align == 2 ) { angle = 180; flip = 0}
   else if(angle == 270 && align == 2 ) { angle =  90; flip = 0}
 
-  else if(angle ==   0 && align == 1 ) { angle =   0; flip = 0; yt+=size*vcorrect}
-  else if(angle ==  90 && align == 1 ) { angle = 270; flip = 0; xt-=size*vcorrect}
-  else if(angle == 180 && align == 1 ) { angle = 180; flip = 0; yt-=size*vcorrect}
-  else if(angle == 270 && align == 1 ) { angle =  90; flip = 0; xt+=size*vcorrect}
+  else if(angle ==   0 && align == 1 ) { angle =   0; flip = 0; text_align = " vcenter=true"}
+  else if(angle ==  90 && align == 1 ) { angle = 270; flip = 0; text_align = " vcenter=true"}
+  else if(angle == 180 && align == 1 ) { angle = 180; flip = 0; text_align = " vcenter=true"}
+  else if(angle == 270 && align == 1 ) { angle =  90; flip = 0; text_align = " vcenter=true"}
 
-  else if(angle ==   0 && align == 5 ) { angle =   0; flip = 0; xt-=size*hcorrect*len}
-  else if(angle ==  90 && align == 5 ) { angle = 270; flip = 0; yt-=size*hcorrect*len}
-  else if(angle == 180 && align == 5 ) { angle = 180; flip = 0; xt+=size*hcorrect*len}
-  else if(angle == 270 && align == 5 ) { angle =  90; flip = 0; yt+=size*hcorrect*len}
+  else if(angle ==   0 && align == 5 ) { angle =   0; flip = 0; text_align = " hcenter=true"}
+  else if(angle ==  90 && align == 5 ) { angle = 270; flip = 0; text_align = " hcenter=true"}
+  else if(angle == 180 && align == 5 ) { angle = 180; flip = 0; text_align = " hcenter=true"}
+  else if(angle == 270 && align == 5 ) { angle =  90; flip = 0; text_align = " hcenter=true"}
 }
 
+function dbg(s)
+{
+  if(debug) print s > "/dev/stderr"
+}
+
+#### end processing geda file: print translated xschem file to stdout
 END{
   print_header()
   print texts
@@ -515,8 +600,10 @@ END{
   print polys
   print components
   print wires
-  # i is the pinseq
+
+  #### print pins
   npin = 0 # order of pins in xschem
+  # i is the pinseq
   for(i = 1; i <= max_pinseq; i++) {
 
     if( i in pin_index) idx = pin_index[i]
@@ -546,10 +633,6 @@ END{
       # print "slotted_pinnumber=" slotted_pinnumber > "/dev/stderr"
       attr_string = attr_string "pinnumber=" slotted_pinnumber "\n"
     }
-   
-
-
-
 
     print pin_box[idx] " {" attr_string "}"
     for(j = 1; j <= nattr; j++) {
@@ -566,10 +649,10 @@ END{
       if( visible ) {
         if(pin_attr[idx, j] ~/^pinnumber$/) text_attr="layer=13" 
         else text_attr=""
-        print "T {" attr "} " xt " " (-yt) " " int(angle/90) " " flip " " size " " size " {" text_attr "}"
+        print "T {" attr "} " xt " " (-yt) " " int(angle/90) " " flip " " size " " size " {" text_attr text_align "}"
       }
     }
     npin++
-  }
+  } # end print pins
 }
  

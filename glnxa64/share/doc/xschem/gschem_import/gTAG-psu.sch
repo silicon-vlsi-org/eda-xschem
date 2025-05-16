@@ -1,4 +1,25 @@
-v {xschem version=2.9.7 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {}
 G {}
 V {}
 S {}
@@ -87,32 +108,32 @@ device=OUTPUT
 C {3.3V-plus-1.sym} 6390 -5370 0 0 {}
 
 N 6310 -5180 6430 -5180 {}
-N 6430 -5180 6430 -5190 {}
+N 6430 -5190 6430 -5180 {}
 N 6350 -5180 6350 -5140 {}
-N 5890 -5130 5890 -5240 {}
+N 5890 -5240 5890 -5130 {}
 N 5800 -5000 6350 -5000 {}
-N 6350 -5000 6350 -5050 {}
-N 5890 -5000 5890 -5040 {}
+N 6350 -5050 6350 -5000 {}
+N 5890 -5040 5890 -5000 {}
 N 6160 -5100 6160 -5000 {}
 N 6210 -5100 6210 -5000 {}
-N 6190 -4950 6190 -5000 {}
-N 6100 -5240 5670 -5240 {}
-N 6100 -5280 6000 -5280 {}
-N 5580 -5170 5530 -5170 {}
-N 5580 -5240 5530 -5240 {}
-N 5800 -5000 5800 -5040 {}
-N 5800 -5130 5800 -5240 {}
+N 6190 -5000 6190 -4950 {}
+N 5670 -5240 6100 -5240 {}
+N 6000 -5280 6100 -5280 {}
+N 5530 -5170 5580 -5170 {}
+N 5530 -5240 5580 -5240 {}
+N 5800 -5040 5800 -5000 {}
+N 5800 -5240 5800 -5130 {}
 N 5700 -5240 5700 -5170 {}
-N 5700 -5170 5670 -5170 {}
+N 5670 -5170 5700 -5170 {}
 N 6230 -5100 6230 -5000 {}
-N 6100 -5170 6080 -5170 {}
+N 6080 -5170 6100 -5170 {}
 N 6080 -5170 6080 -5130 {}
-N 6080 -5130 6000 -5130 {}
-N 6000 -5120 6000 -5140 {}
+N 6000 -5130 6080 -5130 {}
+N 6000 -5140 6000 -5120 {}
 N 6000 -5030 6000 -5000 {}
-N 6000 -5230 6000 -5240 {}
-N 6000 -5240 6000 -5280 {}
+N 6000 -5240 6000 -5230 {}
+N 6000 -5280 6000 -5240 {}
 N 6310 -5240 6500 -5240 {}
 N 6410 -5260 6410 -5240 {}
-N 6410 -5350 6410 -5370 {}
+N 6410 -5370 6410 -5350 {}
 

@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -323,9 +323,9 @@ END{
 
   for(l = 0; l < label["n"]; l++) {
     dbg("label: " l " : " label[l])
-    labx = (symbolx1 + symbolx2) / 2 - length(label[l]) * labelcharspacing /2 
+    labx = (symbolx1 + symbolx2) / 2
     laby = (symboly1 + symboly2) / 2 + ( l - label["n"] / 2 ) * labelspacing + labelcenteroffset
-    text(label[l], labx, laby, 0, 0, labeltextsize, "")
+    text(label[l], labx, laby, 0, 0, labeltextsize, "hcenter=1")
   }
 }  
 
@@ -388,12 +388,12 @@ function text(t, x, y, rot, flip, size, props)
 
 function attrs(a)
 {
-  print "G {" esc(a) "}"
+  print "K {" esc(a) "}"
 }
 
 function header()
 {
-  print "v {xschem version=2.9.9  file_version=1.2}"
+  print "v {xschem version=3.4.8RC file_version=1.2}"
 }
 
 function round(n)

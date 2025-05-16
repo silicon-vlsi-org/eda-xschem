@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=MSP430x43x
-template="device=MSP430x43x
-name=U?
-footprint=none
-numslots=0
-description=\\"16-bit mixed mode microcontroller\\"
-documentation=http://www-s.ti.com/sc/ds/msp430f435.pdf
-"
+v {xschem version=3.0.0 file_version=1.2}
+K {type=MSP430x43x
+template="device=MSP430x43x name=U? footprint=none numslots=0 description=\\"16-bit mixed mode microcontroller\\" documentation=http://www-s.ti.com/sc/ds/msp430f435.pdf "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -14,6 +8,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}

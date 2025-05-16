@@ -1,10 +1,31 @@
-v {xschem version=2.9.7 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {}
 G {}
 V {}
 S {}
 E {}
-T {Spice .SUBCKT for Q2_MSA26F} 6870 -4896.67 0 0 0.666667 0.666667 {}
-T {SDB -- 3.31.2003} 7250 -4808.33 0 0 0.333333 0.333333 {}
+T {Spice .SUBCKT for Q2_MSA26F} 6870 -4880 0 0 0.666667 0.666667 { vcenter=true}
+T {SDB -- 3.31.2003} 7250 -4800 0 0 0.333333 0.333333 { vcenter=true}
 T {This is part of the model for the MSA-2643} 6790 -5080 2 1 0.333333 0.333333 {}
 T {-- a silicon bipolar amp from Agilent.} 6790 -5050 2 1 0.333333 0.333333 {}
 T {The model is detailed in Agilent's app note 5980-2396E} 6790 -5020 2 1 0.333333 0.333333 {}
@@ -75,14 +96,14 @@ N 6450 -5110 6450 -5090 {}
 N 6450 -5090 6600 -5090 {}
 N 6300 -5060 6300 -4950 {}
 N 6300 -4950 6600 -4950 {}
-N 6600 -4900 6600 -4980 {}
+N 6600 -4980 6600 -4900 {}
 N 6260 -5250 6540 -5250 {}
 N 6030 -5250 6170 -5250 {}
 N 6130 -5400 6340 -5400 {}
 N 6600 -5590 6600 -5300 {}
 N 6430 -5400 6600 -5400 {}
 N 6430 -5530 6600 -5530 {}
-N 6340 -5530 6130 -5530 {}
-N 6130 -5250 6130 -5530 {}
-N 6600 -5680 6600 -5740 {}
+N 6130 -5530 6340 -5530 {}
+N 6130 -5530 6130 -5250 {}
+N 6600 -5740 6600 -5680 {}
 

@@ -1,4 +1,24 @@
-v {xschem version=2.9.8 file_version=1.2}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
 K {}
 V {}
@@ -111,3 +131,4 @@ C {spice_probe.sym} 780 -470 0 0 {name=p1 analysis=tran}
 C {spice_probe.sym} 90 -640 0 0 {name=p2 analysis=tran}
 C {spice_probe.sym} 410 -460 0 0 {name=p3 analysis=tran}
 C {spice_probe.sym} 290 -400 0 0 {name=p4 analysis=tran}
+C {title-2.sym} -170 100 0 0 {name=l11 author="Stefan Schippers" rev=1.0 lock=false}

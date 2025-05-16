@@ -4,7 +4,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -101,26 +101,26 @@ proc annotate {} {
   xschem set no_undo 1
   xschem set no_draw 1
   
-  read_hspice_log [xschem get netlist_dir]/hspice.out
+  read_hspice_log $::netlist_dir/hspice.out
   set lastinst [xschem get instances]
   for { set i 0 } { $i < $lastinst } {incr i } {
     set name [xschem getprop instance $i name]
     set type [xschem getprop instance $i cell::type]
     if { $type == "probe"} { 
       set net [xschem instance_net $i p]
-      if {[catch {xschem setprop $i voltage [get_voltage $net] fast} err]} {
+      if {[catch {xschem setprop -fast instance $i voltage [get_voltage $net]} err]} {
         puts "1 error : $err net: $net"
       }
     }
     if { $type == "current_probe"} { 
-      if {[catch {xschem setprop $i current [get_current $name] fast} err]} {
+      if {[catch {xschem setprop -fast instance $i current [get_current $name]} err]} {
         puts "2 error : $err"
       }
     }
     if { $type == "differential_probe"} { 
       set netp [xschem instance_net $i p]
       set netm [xschem instance_net $i m]
-      if {[catch {xschem setprop $i voltage [get_diff_voltage $netp $netm] fast} err]} {
+      if {[catch {xschem setprop -fast instance $i voltage [get_diff_voltage $netp $netm]} err]} {
         puts "3 error : $err"
       }
     }

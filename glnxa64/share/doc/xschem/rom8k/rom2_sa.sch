@@ -1,8 +1,64 @@
-v {xschem version=2.9.5 file_version=1.1}
+v {xschem version=3.4.5 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
+K {}
 V {}
 S {}
 E {}
+B 2 380 -820 1060 -660 {flags=graph
+y1 = 0
+y2 = 2
+divy = 4
+x1=2.44e-07
+x2=3.24e-07
+divx=8
+node="tcleval($\{path\}LDQI
+$\{path\}LDQIB
+$\{path\}LDSALI)"
+color="9 18 7"
+jpeg_quality=30}
+B 2 380 -940 1060 -830 {flags=graph
+y1 = 0
+y2 = 2
+divy = 2
+x1=2.44e-07
+x2=3.24e-07
+divx=8
+node="v(ldcp)
+v(ldprech)"
+color="12 10"
+jpeg_quality=30}
+B 2 380 -650 1060 -510 {flags=graph
+y1 = -0.02
+y2 = 1.6
+divy = 2
+x1=2.44e-07
+x2=3.24e-07
+divx=8
+node="tcleval($\{path\}LDQIII
+$\{path\}LDQII
+$\{path\}LDSALI)"
+color="6 8 7"
+jpeg_quality=30}
 T {Was:
 60/24} 1420 -310 0 0 0.4 0.4 {}
 T {was: LDCP_B} 510 -410 0 0 0.4 0.4 {}
@@ -94,5 +150,5 @@ C {spice_probe.sym} 1320 -600 3 1 {name=p3 analysis=tran}
 C {spice_probe.sym} 200 -390 0 0 {name=p6 analysis=tran}
 C {spice_probe.sym} 270 -630 0 0 {name=p7 analysis=tran}
 C {spice_probe.sym} 940 -380 0 0 {name=p11 analysis=tran}
-C {spice_probe.sym} 1560 -330 2 1 {name=p30 analysis=tran}
+C {spice_probe.sym} 1510 -370 2 1 {name=p30 analysis=tran}
 C {lab_pin.sym} 640 -380 0 0 {name=p12 lab=LDCP_B}

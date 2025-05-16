@@ -1,4 +1,28 @@
 #!/bin/sh
+
+# File: utile.tcl
+# 
+# This file is part of XSCHEM,
+# a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+# simulation.
+# Copyright (C) 1998-2023 Stefan Frederik Schippers
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+
+
 # the next line restarts using wish \
 exec wish "$0" "$@"
 
@@ -157,7 +181,13 @@ proc help_window {w filename} {
 } 
 
 proc translate {f} {
- eval exec "utile $f"
+ global tcl_platform
+ set OS [lindex $tcl_platform(os) 0]
+ if {$OS == "Windows"} {
+    eval exec "utile.bat $f"
+  } else {
+    eval exec "utile $f"
+  }
 }
 
 

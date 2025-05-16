@@ -1,12 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=74393
-template="device=74393
-footprint=DIP14
-name=U?
-description=\\"2 4-bit binary counter with clear\\"
-numslots=0
-documentation=http://www-s.ti.com/sc/ds/sn74hc393.pdf
-Vcc=Vcc
+v {xschem version=3.0.0 file_version=1.2}
+K {type=74393
+template="device=74393 footprint=DIP14 name=U? description=\\"2 4-bit binary counter with clear\\" numslots=0 documentation=http://www-s.ti.com/sc/ds/sn74hc393.pdf Vcc=Vcc
 GND=GND
 "
 tedax_format="footprint @name @footprint
@@ -18,6 +12,7 @@ format="@name @pinlist @value @Vcc @GND"
 extra="Vcc GND"
 extra_pinnumber="14 7"
 }
+G {}
 V {}
 S {}
 E {}
@@ -45,7 +40,7 @@ L 3 0 -260 20 -260 {}
 B 5 -2.5 -262.5 2.5 -257.5 {pinnumber=1
 pinseq=1
 name=1CLK
-dir=inout
+dir=in
 }
 T {@#0:pinnumber} 20 -265 2 0 0.266667 0.266667 {layer=13}
 T {@#0:name} 37.5 -260 2 1 0.266667 0.266667 {}
@@ -133,7 +128,7 @@ L 3 0 -100 20 -100 {}
 B 5 -2.5 -102.5 2.5 -97.5 {pinnumber=13
 pinseq=13
 name=2CLK
-dir=inout
+dir=in
 }
 T {@#11:pinnumber} 20 -105 2 0 0.266667 0.266667 {layer=13}
 T {@#11:name} 37.5 -100 2 1 0.266667 0.266667 {}

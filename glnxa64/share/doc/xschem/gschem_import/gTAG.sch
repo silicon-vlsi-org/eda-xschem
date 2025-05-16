@@ -1,4 +1,25 @@
-v {xschem version=2.9.7 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {}
 G {}
 V {}
 S {}
@@ -39,27 +60,27 @@ device=none
 }
 
 N 5280 -5980 5410 -5980 {lab=tdi_ttl }
-C {lab_wire.sym} 5345 -5980 0 0 {lab=tdi_ttl }
+C {lab_wire.sym} 5330 -5980 0 1 {lab=tdi_ttl }
 N 5280 -5940 5410 -5940 {lab=tdo_ttl }
-C {lab_wire.sym} 5345 -5940 0 0 {lab=tdo_ttl }
+C {lab_wire.sym} 5330 -5940 0 1 {lab=tdo_ttl }
 N 5280 -5900 5410 -5900 {lab=tms_ttl }
-C {lab_wire.sym} 5345 -5900 0 0 {lab=tms_ttl }
+C {lab_wire.sym} 5330 -5900 0 1 {lab=tms_ttl }
 N 5280 -5860 5410 -5860 {lab=tck_ttl }
-C {lab_wire.sym} 5345 -5860 0 0 {lab=tck_ttl }
+C {lab_wire.sym} 5330 -5860 0 1 {lab=tck_ttl }
 N 5280 -5820 5410 -5820 {lab=trst_ttl }
-C {lab_wire.sym} 5345 -5820 0 0 {lab=trst_ttl }
-N 5390 -6230 5120 -6230 {}
+C {lab_wire.sym} 5330 -5820 0 1 {lab=trst_ttl }
+N 5120 -6230 5390 -6230 {}
 N 5120 -6230 5120 -6030 {lab=jtag_power }
-C {lab_wire.sym} 5120 -6130 0 0 {lab=jtag_power }
+C {lab_wire.sym} 5120 -6120 0 1 {lab=jtag_power }
 N 5710 -6230 6010 -6230 {}
 N 6010 -6230 6010 -6030 {lab=usb_power }
-C {lab_wire.sym} 6010 -6130 0 0 {lab=usb_power }
+C {lab_wire.sym} 6010 -6120 0 1 {lab=usb_power }
 N 5730 -5910 5860 -5910 {lab=usb_io+ }
-C {lab_wire.sym} 5795 -5910 0 0 {lab=usb_io+ }
+C {lab_wire.sym} 5750 -5910 0 1 {lab=usb_io+ }
 N 5730 -5880 5860 -5880 {lab=usb_io- }
-C {lab_wire.sym} 5795 -5880 0 0 {lab=usb_io- }
+C {lab_wire.sym} 5750 -5880 0 1 {lab=usb_io- }
 N 5730 -5980 5740 -5980 {}
-N 5740 -5980 5740 -6190 {lab=pon_reset# }
-C {lab_wire.sym} 5740 -6085 0 0 {lab=pon_reset# }
-N 5740 -6190 5710 -6190 {}
+N 5740 -6190 5740 -5980 {lab=pon_reset# }
+C {lab_wire.sym} 5740 -6090 0 1 {lab=pon_reset# }
+N 5710 -6190 5740 -6190 {}
 

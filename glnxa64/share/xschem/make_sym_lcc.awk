@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ function beginfile(f)
  text_voffset=10
  lab_voffset=4
  ip=op=n_pin=n_p=n_l=0
- print "v {xschem version=2.9.8 file_version=1.2}" > sym
+ print "v {xschem version=3.4.8RC file_version=1.2}" > sym
  if(template=="") {
   printf "%s", "K {type=subcircuit\nformat=\"@name @pinlist @symname\"\n"  >sym
   printf "%s\n", "template=\"name=x1\""  >sym

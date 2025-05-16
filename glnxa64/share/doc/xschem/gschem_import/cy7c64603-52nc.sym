@@ -1,9 +1,26 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=cy7c64603-52nc
-template="device=cy7c64603-52nc
-name=U?
-footprint=cy7c64603_qfp
-"
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+K {type=cy7c64603-52nc
+template="device=cy7c64603-52nc name=U? footprint=cy7c64603_qfp "
 tedax_format="footprint @name @footprint
 value @name @value
 device @name @device
@@ -11,6 +28,7 @@ device @name @device
 format="@name @pinlist @value "
 
 }
+G {}
 V {}
 S {}
 E {}
@@ -46,7 +64,7 @@ T {PA4/RDY4} 740 -1020 2 0 0.333333 0.333333 {}
 T {PA5/RDY5} 740 -980 2 0 0.333333 0.333333 {}
 T {CTL0} 740 -130 2 0 0.333333 0.333333 {}
 T {CTL2} 740 -90 2 0 0.333333 0.333333 {}
-T {CY7C64603-52NC} 618 -615 0 1 1 1 {}
+T {CY7C64603-52NC} 380 -590 0 1 1 1 { hcenter=true vcenter=true}
 T {@name} 40 -1150 2 1 0.333333 0.333333 {}
 T {RESERVED1} 450 40 1 1 0.333333 0.333333 {}
 T {RESERVED2} 490 40 1 1 0.333333 0.333333 {}

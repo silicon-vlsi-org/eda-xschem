@@ -1,50 +1,57 @@
-v {xschem version=2.9.8 file_version=1.2}
-G {process
-begin
-  if now = 0 ns then
-    A <= "00000000";
-  elsif A = "00000000" and now > 100 ns then
-    wait;
-  end if;
-  wait for 100 ns;
-  A <= A + 1;
-end process;}
+v {xschem version=3.4.6 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
+G {}
 K {}
-V {initial begin
-  $dumpfile("dumpfile.vcd");
-  $dumpvars(0, greycnt);
-  A=0;
-end
-
-always begin
-  #100000;
-  $display("%08b %08b", A, B);
-  A=A + 1;
-  if(A==0) $finish;
-end}
-S {
-.tran 1n 2000n
-
-* to generate following file copy .../share/doc/xschem/examples/stimuli.greycnt
-* to the simulation directory and run simulation -> Utile Stimuli Editor (GUI), 
-* and press 'Translate'
-.include stimuli_greycnt.cir
-
-.model nmos NMOS
-+ LEVEL=1
-+ LMIN=0.5e-6 LMAX=50e-6 WMIN=0.9e-6 WMAX=1
-+ VTO=0.7 GAMMA=0.45 PHI=0.9
-+ NSUB=9e14 LD=0.08e-6 UO=350 LAMBDA=0.1
-+ TOX=9e-9 PB=0.9 CJ=0.56e-3 CJSW=0.35e-11
-+ MJ=0.45 MJSW=0.2 CGDO=0.4e-9 JS=1.0e-8
-.model pmos PMOS
-+ LEVEL=1
-+ LMIN=0.5e-6 LMAX=50e-6 WMIN=0.9e-6 WMAX=1
-+ VTO=-0.8 GAMMA=0.4 PHI=0.8
-+ NSUB=5e14 LD=0.09e-6 UO=100 LAMBDA=0.2
-+ TOX=9e-9 PB=0.9 CJ=0.94e-3 CJSW=0.32e-11
-+ MJ=0.5 MJSW=0.3 CGDO=0.3e-9 JS=0.5e-8}
+V {}
+S {}
 E {}
+B 2 0 -670 530 -450 {flags=graph
+y1=0
+y2=3
+ypos1=0.13175071
+ypos2=2.0823094
+divy=5
+subdivy=1
+unity=1
+x1=0
+x2=1.2u
+
+subdivx=4
+xlabmag=1.2
+ylabmag=1.0
+node="A;a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]
+B;b[7],b[6],b[5],b[4],b[3],b[2],b[1],b[0]
+C;c[7],c[6],c[5],c[4],c[3],c[2],c[1],c[0]
+a[0]
+b[0]
+c[0]"
+
+dataset=-1
+unitx=1
+logx=0
+logy=0
+digital=1
+color="4 4 4 4 4 4"
+divx=4}
 T {BINARY} 500 -780 0 0 0.4 0.4 {}
 T {GRAY} 830 -780 0 0 0.4 0.4 {}
 T {BINARY} 1210 -780 0 0 0.4 0.4 {}
@@ -119,15 +126,27 @@ N 620 -450 620 -410 {lab=A[4]}
 N 620 -370 620 -330 {lab=A[3]}
 N 620 -290 620 -250 {lab=A[2]}
 N 620 -210 620 -170 {lab=A[1]}
+N 1240 -700 1240 -100 {
+
+bus=true
+lab=C[7:0]}
+N 1240 -100 1280 -100 {
+
+bus=true
+lab=C[7:0]}
+N 560 -680 560 -80 {
+
+bus=true
+lab=A[7:0]}
+N 520 -80 560 -80 {
+
+bus=true
+lab=A[7:0]}
 C {title.sym} 160 -30 0 0 {name=l3 author="Stefan Schippers"}
 C {verilog_timescale.sym} 30 -110 0 0 {name=s1 timestep="1ps" precision="1ps" }
 C {xnor.sym} 660 -470 0 0 {name=x2}
 C {xnor.sym} 660 -550 0 0 {name=x3}
 C {xnor.sym} 660 -630 0 0 {name=x14}
-C {lab_pin.sym} 570 -690 0 0 {name=p9 lab=A[7] }
-C {lab_pin.sym} 570 -610 0 0 {name=p1 lab=A[6] }
-C {lab_pin.sym} 570 -530 0 0 {name=p2 lab=A[5] }
-C {lab_pin.sym} 570 -450 0 0 {name=p3 lab=A[4] }
 C {lab_pin.sym} 830 -710 0 1 {name=p4 lab=B[7]}
 C {lab_pin.sym} 830 -630 0 1 {name=p0 lab=B[6]}
 C {lab_pin.sym} 830 -550 0 1 {name=p5 lab=B[5]}
@@ -136,14 +155,10 @@ C {assign.sym} 660 -690 0 0 {name=v1 delay=1}
 C {xnor.sym} 660 -230 0 0 {name=x1}
 C {xnor.sym} 660 -310 0 0 {name=x4}
 C {xnor.sym} 660 -390 0 0 {name=x5}
-C {lab_pin.sym} 570 -370 0 0 {name=p7 lab=A[3] }
-C {lab_pin.sym} 570 -290 0 0 {name=p8 lab=A[2] }
-C {lab_pin.sym} 570 -210 0 0 {name=p10 lab=A[1]}
 C {lab_pin.sym} 830 -390 0 1 {name=p11 lab=B[3]}
 C {lab_pin.sym} 830 -310 0 1 {name=p12 lab=B[2]}
 C {lab_pin.sym} 830 -230 0 1 {name=p13 lab=B[1]}
 C {xnor.sym} 660 -150 0 0 {name=x6}
-C {lab_pin.sym} 570 -130 0 0 {name=p14 lab=A[0]}
 C {lab_pin.sym} 830 -150 0 1 {name=p15 lab=B[0]}
 C {lab_pin.sym} 150 -220 0 1 { name=l16 lab=B[7:0] }
 C {lab_pin.sym} 90 -200 0 0 { name=l17 lab=A[7:0]  verilog_type=reg}
@@ -155,16 +170,8 @@ C {xnor.sym} 1060 -230 0 0 {name=x10}
 C {xnor.sym} 1060 -310 0 0 {name=x11}
 C {xnor.sym} 1060 -390 0 0 {name=x12}
 C {xnor.sym} 1060 -150 0 0 {name=x13}
-C {lab_pin.sym} 1230 -710 0 1 {name=p18 lab=C[7]}
-C {lab_pin.sym} 1230 -630 0 1 {name=p19 lab=C[6]}
-C {lab_pin.sym} 1230 -550 0 1 {name=p20 lab=C[5]}
-C {lab_pin.sym} 1230 -470 0 1 {name=p21 lab=C[4]}
-C {lab_pin.sym} 1230 -390 0 1 {name=p22 lab=C[3]}
-C {lab_pin.sym} 1230 -310 0 1 {name=p23 lab=C[2]}
-C {lab_pin.sym} 1230 -230 0 1 {name=p24 lab=C[1]}
-C {lab_pin.sym} 1230 -150 0 1 {name=p25 lab=C[0]}
 C {lab_pin.sym} 150 -190 0 1 { name=l26 lab=C[7:0] }
-C {use.sym} 60 -650 0 0 {library ieee;
+C {use.sym} 60 -770 0 0 {library ieee;
 use std.TEXTIO.all;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
@@ -172,3 +179,102 @@ use ieee.std_logic_unsigned.all;
 
 
 }
+C {noconn.sym} 90 -200 0 1 {name=l1}
+C {bus_tap.sym} 1240 -140 3 0 {name=l2 lab=[0]}
+C {bus_tap.sym} 1240 -220 3 0 {name=l4 lab=[1]}
+C {bus_tap.sym} 1240 -300 3 0 {name=l5 lab=[2]}
+C {bus_tap.sym} 1240 -380 3 0 {name=l6 lab=[3]}
+C {bus_tap.sym} 1240 -460 3 0 {name=l7 lab=[4]}
+C {bus_tap.sym} 1240 -540 3 0 {name=l8 lab=[5]}
+C {bus_tap.sym} 1240 -620 3 0 {name=l9 lab=[6]}
+C {bus_tap.sym} 1240 -700 3 0 {name=l10 lab=[7]}
+C {lab_pin.sym} 1280 -100 0 1 {name=p16 lab=C[7:0]}
+C {bus_tap.sym} 560 -120 1 1 {name=l11 lab=[0]}
+C {bus_tap.sym} 560 -200 1 1 {name=l12 lab=[1]}
+C {bus_tap.sym} 560 -280 1 1 {name=l13 lab=[2]}
+C {bus_tap.sym} 560 -360 1 1 {name=l14 lab=[3]}
+C {bus_tap.sym} 560 -440 1 1 {name=l15 lab=[4]}
+C {bus_tap.sym} 560 -520 1 1 {name=l18 lab=[5]}
+C {bus_tap.sym} 560 -600 1 1 {name=l19 lab=[6]}
+C {bus_tap.sym} 560 -680 1 1 {name=l20 lab=[7]}
+C {lab_pin.sym} 520 -80 0 0 {name=p1 lab=A[7:0]}
+C {launcher.sym} 130 -430 0 0 {name=h5
+descr="load waves" 
+tclcommand="xschem raw_read $netlist_dir/greycnt.raw tran"
+}
+C {simulator_commands.sym} 240 -210 0 0 {name=COMMANDS
+verilog_ignore=1
+vhdl_ignore=1
+spice_ignore="tcleval([regexp -nocase \{xyce\} $sim(spice,$sim(spice,default),name)])"
+simulator=ngspice
+only_toplevel=false 
+value="
+* ngspice commands
+.options save all
+.control  
+  tran 1n 2000n
+  remzerovec
+  write greycnt.raw
+.endc
+
+* to generate following file copy .../share/doc/xschem/examples/stimuli.greycnt
+* to the simulation directory and run simulation -> Utile Stimuli Editor (GUI), 
+* and press 'Translate'
+.include stimuli_greycnt.cir
+
+.model nmos nmos level=49 version=3.3.0 vth0=0.8
+.model pmos pmos level=49 version=3.3.0 vth0=-0.8
+"}
+C {simulator_commands.sym} 370 -210 0 0 {name=COMMANDS1
+verilog_ignore=1
+vhdl_ignore=1
+spice_ignore="tcleval([regexp -nocase \{ngspice\} $sim(spice,$sim(spice,default),name)])"
+
+simulator=xyce
+only_toplevel=false 
+value="
+* Xyce commands
+VGND GND 0 0
+.tran 0.1n 2000n
+.print tran format=raw
++ file=greycnt.raw v(*) i(*)
+
+* to generate following file copy .../share/doc/xschem/examples/stimuli.greycnt
+* to the simulation directory and run simulation -> Utile Stimuli Editor (GUI), 
+* and press 'Translate'
+.include stimuli_greycnt.cir
+
+.model nmos nmos level=49 version=3.3.0 vth0=0.8
+.model pmos pmos level=49 version=3.3.0 vth0=-0.8
+
+"}
+C {code.sym} 240 -380 0 0 {name=VHDL 
+only_toplevel=false 
+spice_ignore=1
+verilog_ignore=1
+value="process
+begin
+  if now = 0 ns then
+    A <= \\"00000000\\";
+  elsif A = \\"00000000\\" and now > 100 ns then
+    wait;
+  end if;
+  wait for 100 ns;
+  A <= A + 1;
+end process;"}
+C {code.sym} 370 -380 0 0 {name=Verilog
+only_toplevel=false
+vhdl_ignore=1
+spice_ignore=1
+value="initial begin
+  $dumpfile(\\"dumpfile.vcd\\");
+  $dumpvars(0, greycnt);
+  A=0;
+end
+
+always begin
+  #100000;
+  $display(\\"%08b %08b %08b\\", A, B, C);
+  A=A + 1;
+  if(A==0) $finish;
+end"}

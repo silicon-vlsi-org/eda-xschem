@@ -1,7 +1,7 @@
 usage: xschem [options] [schematic | symbol ]
 Options:
   -h  --help           Print this help.
-  -b  --batch          Detach Xschem from console.
+  -b  --detach         Detach Xschem from console (no output and no input from console)
   -n  --netlist        Do a netlist of the given schematic cell.
   -v  --version        Print version information and exit.
   -V  --vhdl           Set netlist type to VHDL.
@@ -9,24 +9,29 @@ Options:
                        (spice/Verilog/VHDL, depending on the netlist 
                        type chosen).
   -w  --verilog        Set netlist type to Verilog.
-  --tcl <tcl_script>   Execute specified tcl instructions before any other action,
-                       this can be used to change xschemrc variables.
+  --tcl <tcl_cmd>      Execute specified tcl instructions before any other action,
+                       after sourcing xschemrc, this can be used to change xschemrc variables.
+  --preinit <tcl_cmd>  Execute specified tcl instructions before any other action,
+                       and before loading xschemrc.
   --script <file>      Execute specified tcl file as a command script (perhaps with xschem  commands).
+  --command <tcl_cmd>  Execute specified tcl commands after completing startup.
+  --diff <file>        Show differences with given file.
   --tcp_port <number>  Listen to specified tcp port for client connections. (number >=1024).
   -i  --no_rcload      Do not load any xschemrc file.
   --netlist_path <path>
   -o <path>            Set output path for netlist.
   --netlist_filename <file>    
-  -N <file>            Set name (only name, not path) of top level netlist file.
+  -N <file>            Set name (only name or full path) of top level netlist file.
   -t  --tedax          Set netlist type to tEDAx.
   -s  --spice          Set netlist type to SPICE.
+  -y  --symbol         Set netlist type to SYMBOL (used when drawing symbols)
   -x  --no_x           Don't use X (only command mode).
   -z  --rainbow        Use a raibow-looking layer color table.
   -W  --waves          Show simulation waveforms.
   -f  --flat_netlist   Set flat netlist (for spice format only).
-  -r  --no_readline    Start without the tclreadline package ( this is
-                       necessary if stdin and stdout are to be redirected
-                       for example to /dev/null).
+  -r  --no_readline    Start without the tclreadline package, this is necessary
+      --pipe           if stdin and stdout are to be redirected. This also prevents xschem
+                       from closing stdin / stdout / stderr even if invoked from pipes.
   -c  --color_ps       Set color postscript.
   --plotfile <file>    Use <file> as output for plot (png, svg, ps).
   --rcfile <file>      Use <file> as a rc file for startup instead of the

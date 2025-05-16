@@ -1,13 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=4518
-template="device=4518
-footprint=DIP16
-slot=1
-numslots=2
-name=U?
-description=\\"2 BCD counter\\"
-documentation=http://www.semiconductors.philips.com/acrobat/datasheets/HEF4518B_CNV_3.pdf
-VDD=VDD
+v {xschem version=3.0.0 file_version=1.2}
+K {type=4518
+template="device=4518 footprint=DIP16 slot=1 numslots=2 name=U? description=\\"2 BCD counter\\" documentation=http://www.semiconductors.philips.com/acrobat/datasheets/HEF4518B_CNV_3.pdf VDD=VDD
 VSS=VSS
 "
 tedax_format="footprint @name @footprint
@@ -19,6 +12,7 @@ format="@name @pinlist @value @VDD @VSS"
 extra="VDD VSS"
 extra_pinnumber="16 8"
 }
+G {}
 V {}
 S {}
 E {}
@@ -40,7 +34,7 @@ L 3 0 -150 30 -150 {}
 B 5 -2.5 -152.5 2.5 -147.5 {
 pinseq=1
 name=CLK
-dir=inout
+dir=in
 pinnumber=1:9
 }
 T {@#0:pinnumber} 20 -155 2 0 0.266667 0.266667 {layer=13}

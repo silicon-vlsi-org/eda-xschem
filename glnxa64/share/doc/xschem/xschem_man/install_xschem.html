@@ -20,12 +20,42 @@ p{padding: 15px  30px 10px;}
 <a href="run_xschem.html" class="next">NEXT</a>
 
  <!-- slide title -->
+ <h1> DOWNLOAD XSCHEM </h1><br>
+ <p>
+  You should download the xschem sources from one of these repositories:
+ </p>
+ <ul>
+ <li> From repo.hu with subversion:</li>
+ <pre class="code">
+  svn checkout svn://repo.hu/xschem/trunk xschem-src
+ </pre><br>
+
+ <li> From sourceforge.net with subversion:</li>
+ <pre class="code">
+  svn checkout https://svn.code.sf.net/p/xschem/code/ xschem-src
+ </pre><br>
+
+ <li> From github.com with git:</li>
+ <pre class="code">
+  git clone https://github.com/StefanSchippers/xschem.git xschem-src
+ </pre><br>
+ </ul>
+
+ <h2> Attention </h2>
+ <p class="important">
+  If you have a binary xschem package installed on the system you should remove it.
+  Packaged xschem versions are too old and they conflict with the one you are building from source.
+  To remove: (this command is for Debian/Ubuntu, use similar commands for other distributions)<br>
+  <kbd> sudo apt-get purge xschem</kbd><br>
+ </p>
+ 
+
  <h1> INSTALL XSCHEM </h1><br>
  <p>
  in order to install the program run the following command:
  </p>
  <pre class="code">
-  user:~$ cd xschem-&lt;version&gt;; ./configure
+  user:~$ cd xschem-src; ./configure
  </pre>
  <p>
   This will make all the necessary checks for required libraries and system tools. 
@@ -35,15 +65,26 @@ p{padding: 15px  30px 10px;}
  Tck/Tk versions may vary on different systems, 8.4, 8.5, 8.6 versions are all good.
  </p>
  <pre class="code">
-  libX11-6              libx11-dev
-  libxrender1           libxrender-dev
-  libxcb1               libx11-xcb-dev        
-  libcairo2             libcairo2-dev
-  tcl8.6                tcl8.6-dev
-  tk8.6                 tk8.6-dev
-  flex                  bison
-  libxpm4               libxpm-dev
-            gawk or mawk
+  LIBRARIES                              DEVELOPMENT FILES
+-----------------------------------------------------------
+  libx11-6                               libx11-dev
+  libxrender1                            libxrender-dev
+  libxcb1                                libx11-xcb-dev        
+  libcairo2                              libcairo2-dev
+  tcl8.6                                 tcl8.6-dev
+  tk8.6                                  tk8.6-dev
+  flex                                   bison
+  libxpm4                                libxpm-dev
+  libjpeg62-turbo or libjpeg             libjpeg-dev
+
+# terminal program and editor used by default by xschem:
+# alternative programs can be specified in xschemrc by 
+# setting tcl variables 'terminal' and 'editor', respectively.
+  xterm vim-gtk3
+# tools that should be available on all systems by default:
+  gawk or mawk
+# Suggested (not mandatory for using xschem) packages:
+  tcl-tclreadline
 </pre>
 
  <p>If configure ends with no errors we are ready to compile:
@@ -55,7 +96,7 @@ p{padding: 15px  30px 10px;}
  installation, for example in /usr/local):
  </p>
  <pre class="code">
-  user:~$ make install
+  user:~$ sudo make install
  </pre>
  <p>
   This will install all the runtime needed files into the locations previously configured
@@ -64,16 +105,13 @@ p{padding: 15px  30px 10px;}
  </p>
  <pre class="code">
    ./configure --prefix=new/prefix/path
- </pre>
- <p>
-  DESTDIR is supported.
- </p>
+ </pre><br>
  <p class="important">
   For testing purposes <kbd>xschem</kbd> can be run and invoked from the build directory
   <kbd>xschem-&lt;version&gt;/src/</kbd> without installation.
  </p><br>
  <pre class="code">
-  user:~$ cd xschem-2.7.0/src && ./xschem
+  user:~$ cd xschem-2.7.0/src &amp;&amp; ./xschem
  </pre>
  <p>
   When xschem is running, type <kbd>puts $XSCHEM_LIBRARY_PATH</kbd> in the xschem tcl prompt to 
@@ -90,29 +128,55 @@ p{padding: 15px  30px 10px;}
   If you need to override system settings, create a
   <kbd>~/.xschem/xschemrc</kbd>. The easiest way is to copy the system
   installed version from ${prefix}/share/xschem/xschemrc and then
-  make the necessary changes
+  make the necessary changes.
  </p> 
  <pre class="code">
   user:$ mkdir ~/.xschem
   user:$ cp &lt;install root&gt;/share/xschem/xschemrc ~/.xschem/xschemrc
  </pre><br>
+ <p class="important"> When xschem is run the first time it will do the above operations, create a
+  <kbd>${HOME}/.xschem/</kbd> directory and place a <kbd>xschemrc</kbd> into it.</p>
  <br><br>
+
+
+ <h2> - Build xschem with a custom tcl-tk installation </h2>
+ <p> If you need to build xschem against a tcl-tk installation located in a non-standard place you
+     must provide additional options to the .configure script.<br>
+     Suppose there is a tcl-tk version 8.4 installation in <kbd>/home/schippes/x/tcltk</kbd>
+     then the following commands must be given before runninkg make and make install:
+ </p>
+ <pre class=code>
+export LD_LIBRARY_PATH=/home/schippes/x/tcltk/lib
+
+./configure \
+--prefix=/home/schippes \
+/arg/tcl-version=8.4 \
+/arg/tk-version=8.4 \
+--prefix/libs/script/tcl=/home/schippes/x/tcltk \
+--prefix/libs/script/tk=/home/schippes/x/tcltk \
+--debug
+ </pre>
+ <p> This is the command I run to build and test xschem with tcl-tk 8.4 which was released 20 years ago.</p>
+
 
  <h2> -Technical information - Detailed XSCHEM startup sequence </h2>
  <p class="important"> Information here under is not meant to be executed by the user </p><br>
  <ol>
+ <li>Source system-wide xschemrc if existing: <kbd>XSCHEM_SHAREDIR/xschemrc</kbd>.
+     This file is by default all commented so it does nothing.
+     See below how <kbd>XSCHEM_SHAREDIR</kbd> path is generated.</li>
  <li>If <kbd>--rcfile=&lt;rcfile&gt;</kbd> is given then source the specified rcfile. Do not load any other rcfile.</li>
  <li>If <kbd>../src/xchem.tcl</kbd> with respect to current dir is existing and
      <kbd>../xschem_library</kbd> is also existing then we are starting
      from a build directory, set <kbd>XSCHEM_SHAREDIR</kbd> to <kbd>&lt;current dir&gt;</kbd> and
-     also set <br><kbd>XSCHEM_LIBRARY_PATH</kbd> to <kbd>.:/../xschem_library/devices</kbd>.</li>
+     also set <kbd>XSCHEM_LIBRARY_PATH</kbd> to <kbd>../xschem_library/devices</kbd>.</li>
  <li>Else use compile-time (generated from configure script) provided <kbd>XSCHEM_SHAREDIR</kbd>.
- <li>Source system-wide xschemrc if existing: <kbd>XSCHEM_SHAREDIR/xschemrc</kbd></li>
+     (default is <kbd>/usr/local/share/xschem</kbd>).</li>
  <li>If in current dir there is a <kbd>xschemrc</kbd> file source it.</li>
  <li>Else if there is a <kbd>USER_CONF_DIR/xschemrc</kbd> file source it.
      <kbd>XSCHEM_SHAREDIR</kbd>  and <kbd>USER_CONF_DIR</kbd> are preprocessor macros
      passed at compile time by the configure script.
-     The first one will be overridden only if executing from a build directory, see item 2.</li>
+     The first one will be overridden only if executing from a build directory, see item 3.</li>
  <li>If <kbd>XSCHEM_SHAREDIR</kbd> not defined --&gt; error and quit.</li>
  <li>Start loading user provided schematic file or start with empty window  (or filename
      specified in <kbd>XSCHEM_START_WINDOW</kbd> tcl variable).</li>

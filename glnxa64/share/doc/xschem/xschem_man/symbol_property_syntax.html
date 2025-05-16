@@ -28,9 +28,9 @@ p{padding: 15px  30px 10px;}
  </p>
  <ul>
  <li><kbd>type</kbd> defines the the type of symbol. Normally the type attribute describes the symbol 
-   and ignored by XSCHEM, but there are some special types:</li>
+   and is ignored by XSCHEM, but there are some special types:</li>
    <ul>
-    <li><kbd>subcircuit</kbd>: the symbol has an underlining schematic representation,
+    <li><kbd>subcircuit</kbd>: the symbol has an underlying schematic representation,
      when producing the netlist XSCHEM has to descend into the corresponding schematic.
      This will be covered in the subcircuits chapter. </li>
     <li><kbd>primitive</kbd>: the symbol has a schematic representation, you can descend into it  but the netlister 
@@ -45,14 +45,14 @@ p{padding: 15px  30px 10px;}
      file even if it exists. Xschem will not allow to descend into an existing schematic.</li>
     <li><kbd>label</kbd>: the symbol is used to label a net. These type of symbols must have
      one and only one pin, and the template string must define a <kbd>lab</kbd> attribute
-     that is passed at component instantiationi to name the net it is attached to. </li>
+     that is passed at component instantiation to name the net it is attached to. </li>
     <li><kbd>probe</kbd>: this denotes a probe symbol that may be backannotated with a
      backannotation script (example: ngspice_backannotate.tcl).</li>
     <li><kbd>ngprobe</kbd>: This is a probe element that uses a 'pull' method to fetch simulation 
      data and display it in current schematic. The data displayed is thus dynamic, multiple
-     instancs of the same symbol with annotators will display operating point data for that particular
+     instances of the same symbol with annotators will display operating point data for that particular
      instance without the need to update the backannotation as is required for annotators 
-     using the 'push' annotation methid.</li>
+     using the 'push' annotation method.</li>
     <li><kbd>netlist_commands</kbd>: the symbol is used to place SPICE commands into a spice netlist.
      It should also have a <kbd>value</kbd> attribute that may contain arbitrary text that is 
      copied verbatim into the netlist. More on this in the <a href="...">netlist</a> slide.</li>
@@ -62,7 +62,7 @@ p{padding: 15px  30px 10px;}
     Only symbols of type <kbd>subcircuit</kbd> or <kbd>primitive</kbd> may be descended into
     with the <kbd>'e'</kbd> bindkey if they have a schematic view.
    </p><br>
- <li><kbd>format</kbd>:The format attribute defines the syntax for the SPICE netlist. the <kbd>@</kbd>
+ <li><kbd>format</kbd>: The format attribute defines the syntax for the SPICE netlist. the <kbd>@</kbd>
      character is a 'substitution character', it means that the token that follows is a parameter
      that will be substituted with the value passed at component instantiation. If no 
      value is given there a value will be picked from the attribute declared in the <kbd>template</kbd>
@@ -88,9 +88,18 @@ p{padding: 15px  30px 10px;}
      or LVS (no device subcircuits).
      </li>
      <img src="spiceprefix.png">
+
+ <li><kbd>lvs_format</kbd>: This is the netlisting format attribute that is automatically selected if Xschem is set
+     to produce a LVS netlist (<kbd>Simulation-&gt;LVS netlist: top level is a subckt</kbd>). This means that a
+     symbol may have two different attributes for netlisting: <kbd>format</kbd> use dfor spice simulations and 
+     <kbd>lvs_format</kbd> for schematic to layout (LVS) comparison. More in general the xschem command
+     <kbd>xschem set format my_format</kbd> will instruct xschem to use <kbd>my_format</kbd> as netlisting
+     rule for components that have this attribute defined. If symbols do not have the <kbd>my_format</kbd>
+     attribute the default fallback (<kbd>format</kbd> for spice netlist) is used.</li><br>
+
  <li><kbd>template</kbd>: Specifies default values for symbol parameters</li>
- </ul>
 <img src="general_rules.png">
+ </ul>
  <p>
   The order these attributes appear in the property string is not important, 
   they can be on the same line or on different lines:
@@ -131,9 +140,9 @@ type=nmos
  </p>
  <br>
  <p class="important">
-  In recent xschem versions a <kbd>$</kbd> prefixed attribute (example: <kbd>$var</kbd>) can be used
+  In recent xschem versions a <kbd>%</kbd> prefixed attribute (example: <kbd>%var</kbd>) can be used
   instead of a <lbd>@</kbd> prefix. The only difference is that if no matching attribute is defined
-  in instance the <kbd>$var</kbd> resolves to <kbd>var</kbd> instead of an empty string.
+  in instance the <kbd>%var</kbd> resolves to <kbd>var</kbd> instead of an empty string.
  </p>
  <img src="attribute_substitution.png">
  <p>
@@ -145,36 +154,98 @@ type=nmos
   <li><kbd>vhdl_ignore</kbd></li>
   <li><kbd>spice_ignore</kbd></li>
   <li><kbd>verilog_ignore</kbd></li>
-  <p>These 3 attributes tell XSCHEM to ignore completely the symbol in the respective netlist formats.</p>
+  <li><kbd>tedax_ignore</kbd></li>
+  <p>These 4 attributes tell XSCHEM to ignore completely all instances of the symbol in the respective netlist formats.
+   Allowed values for these attributes are <kbd>true</kbd> (or <kbd>open</kbd>), <kbd>false</kbd> and
+   <kbd>short</kbd>
+   If <kbd>short</kbd> is specified all symbol instances will short together all their pins. For this to work
+   only one of the nets connected to the symbol may have a net label attached to it. All other nets will take this name.
+   If more labeled nets connect to the shorted symbol a net short error is reported.
+   Shorted symbol instances are displayed in the pin color (red) layer. See some images in the 
+    <a href="component_property_syntax.html#spice_ignore">component properties man page</a> when describing the same instance
+   based attributes.<br>
+   Disabled symbols (<kbd>spice_ignore=true</kbd> or <kbd>spice_ignore=open</kbd>) are displayed in grey.</p>
+
+
+  <li><kbd>lvs_ignore</kbd></li>
+  <p> This attribute works in the same way as above attributes, may take the values
+   <kbd>true</kbd> (or <kbd>open</kbd>), <kbd>false</kbd> or <kbd>short</kbd>, and 
+   will affect the symbol behaviour in the same way, but only if tcl variable 
+   <kbd>lvs_ignore</kbd> is set to <kbd>1</kbd>. This can be done in the Simulation menu:
+   <kbd>Set 'lvs_ignore' variable</kbd>. If this <kbd>lvs_ignore</kbd> is set on the symbol
+   it will be shorted / ignored or kept as is depending on its <kbd>lvs_ignore</kbd> attribute
+   and will be effective in all netlisting formats. This is mostly used to modify the produced netlist
+   automatically when doing schematic vs layout (LVS) comparison.</p>
+
+
   <li><kbd>vhdl_stop</kbd></li>
   <li><kbd>spice_stop</kbd></li>
   <li><kbd>verilog_stop</kbd></li>
-  <p> These 3 attributes will avoid XSCHEM to descend into the schematic representation of the symbol
-    (if there is one) when building the respective netlist format. For example, if an analog block
-    has a schematic (.sch) file describing the circuit that is meaningless when doing a VHDL netlist,
-    we can use a <kbd>vhdl_stop=true</kbd> attribute to avoid descending into the schematic.
-    Only the global property of the schematic will be netlisted. This allows to insert some 
-    behavioral VHDL code in the global schematic property that describes the block in a way
-    the VHDL simulator can understand.</p>
+  <li><kbd>tedax_stop</kbd></li>
+  <p> These 4 attributes will avoid XSCHEM to descend into the schematic representation of the symbol
+   (if there is one) when building the respective netlist format. For example, if an analog block
+   has a schematic (.sch) file describing the circuit that is meaningless when doing a VHDL netlist,
+   we can use a <kbd>vhdl_stop=true</kbd> attribute to avoid descending into the schematic.
+   Only the global property of the schematic will be netlisted. This allows to insert some 
+   behavioral VHDL code in the global schematic property that describes the block in a way
+   the VHDL simulator can understand.</p>
   <li><kbd>spice_primitive</kbd></li>
   <li><kbd>vhdl_primitive</kbd></li>
   <li><kbd>verilog_primitive</kbd></li>
-  <p> same as above <kbd>_stop</kbd> attributes, but in this case the schematic subcircuit is completely ignored,
+  <p> Same as above <kbd>_stop</kbd> attributes, but in this case the schematic subcircuit is completely ignored,
    only the 'format' string is dumped to netlist. No component/entity is generated in vhdl netlist, 
    no module declaration in verilog, no .subckt in spice, no schematic global attributes are exported to netlist.</p>
+
+  <li><kbd>default_schematic</kbd></li>
+  <p> If set to <kbd>ignore</kbd> xschem will not descend into the symbol associated schematic and will
+   not complain if this schematic does not exists. To descend into a schematic instances must specify a 
+   <kbd>schematic</kbd> attribute, otherwise no descending and expansion occurs.</p>
+
+  <li><kbd>spice_sym_def</kbd></li>
+  <li><kbd>verilog_sym_def</kbd></li>
+  <li><kbd>vhdl_sym_def</kbd></li>
+  <p> If any of these attributes are present and not empty  and the symbol type is set to <kbd>subcircuit</kbd>
+   the corresponding netlister will ignore the schematic subcircuit
+   and dump into the netlist the content of this attribute. The typical usage is to include a file, example:<br>
+  <pre class="code">
+    verilog_sym_def="tcleval(`include \"[abs_sym_path verilog_include_file.v]\")"
+  </pre>
+  </p>
+  <p class="important">
+   For spice netlists if <kbd>@pinlist</kbd> is used in format string and <kbd>spice_sym_def</kbd> attribute 
+   is defined the port order will be derived from the subcircuit
+   referenced by the <kbd>spice_sym_def</kbd> attribute.
+  </p>
+  <p>
+   In this example a <kbd>verilog_include_file.v</kbd> is included using the verilog <kbd>`include</kbd> directive.
+   In order to generate a full path for it the <kbd>abs_sym_path</kbd> TCL function is used that searches for this file
+   in any of the <kbd>XCHEM_LIBRARY_PATH</kbd> directories. Since TCL is used the attribute is wrapped into a tcleval(...),<br>
+   The following will appear in the generated netlist:
+   <pre class="code">
+// expanding   symbol:  verilog_include.sym # of pins=3
+// sym_path: /home/schippes/.xschem/xschem_library/verilog_include.sym
+`include "/home/schippes/.xschem/xschem_library/verilog_include_file.v"
+   </pre>
+  </p>
   <li><kbd>highlight</kbd></li>
   <p>If set to <kbd>true</kbd> the symbol will be highlighted when one of the nets attached to its pins are highlighted.</p>
   <li><kbd>net_name</kbd></li>
   <p>If set to <kbd>true</kbd> the <kbd>#n:net_name</kbd> symbol attributes will display the net names attached to pin terminals.
      the <kbd>n</kbd> is a pin number or name.</p>
   <li><kbd>place</kbd></li>
-  <p> this attribute is only useable in <kbd>netlist_commands</kbd> type symbols (<kbd>netlist.sym, code.sym,...</kbd>) 
+  <p> This attribute is only useable in <kbd>netlist_commands</kbd> type symbols (<kbd>netlist.sym, code.sym,...</kbd>) 
     if set to <kbd>end</kbd> it tells XSCHEM that 
     the component instance of that symbol must be netlisted at the end, after all the other elements.
-    This is sometimes needed for SPICE commands that must ge given at the end of the netlist.
-    This will be explained more in detail in the <a href="...">netlisting</a> slide.</p>
+    This is sometimes needed for SPICE commands that must given at the end of the netlist.
+    This will be explained more in detail in the <a href="...">netlisting</a> slide.
+    <br>
+    The <kbd>place=header</kbd> attribute is only valid only for netlist_commands
+    type symbols and spice netlisting mode, it tells XSCHEM that this component must be
+    netlisted in the very first part of a spice netlist.
+    This is necessary for some spice commands that need to be placed before the rest of the netlist.
+  </p>
   <li><kbd>generic_type</kbd></li>
-  <p><kbd>generic_type</kbd> defines the type of parameters passed to VHDL components. Consider the following
+  <p><kbd>generic_type</kbd> defines the type of parameters passed to VHDL/Verilog components. Consider the following
     MOS symbol definition; the <kbd>model</kbd> attribute is declared as <kbd>string</kbd> and it will be
     quoted in VHDL netlists.
   </p>
@@ -234,8 +305,7 @@ verilog_stop=true
 x2 G_y G_a G_b G_c VCC VSS lvnand3 wn=1.8u ln=0.18u wp=1u lp=0.18u m=1
 **.ends
 * expanding symbol: customlogicLib/lvnand3 # of pins=4
-.subckt lvnand3 y a b c VCCPIN VSSPIN
-wn=30u ln=2.4u wp=20u lp=2.4u
+.subckt lvnand3 y a b c VCCPIN VSSPIN wn=30u ln=2.4u wp=20u lp=2.4u
 *.opin y
 *.ipin a
 *.ipin b
@@ -265,9 +335,7 @@ x2 G_y G_a G_b G_c VCC VSS lvnand3 wn=1.8u ln=0.18u wp=1u lp=0.18u m=1
 * expanding symbol: customlogicLib/lvnand3 # of pins=4
 
 
-.subckt lvnand3 y a b c
-wn=30u ln=2.4u wp=20u lp=2.4u
-VCCPIN=VCC VSSPIN=VSS
+.subckt lvnand3 y a b c wn=30u ln=2.4u wp=20u lp=2.4u VCCPIN=VCC VSSPIN=VSS
 *.opin y
 *.ipin a
 *.ipin b
@@ -286,13 +354,80 @@ m5 net1 b net2 VSSPIN nlv w=wn l=ln geomod=0 m=1
 .ends
   </pre>
   <p>
-  as you can see the VSSPIN and VCCPIN are listed as parameters and not as pins in the netlist. 
+  as you can see the VSSPIN and VCCPIN are listed as parameters in addition as pins in the netlist. 
+  </p>
+  <li><kbd>verilog_extra</kbd></li>
+  <p> 
+  This attribute is similar to the <kbd>extra</kbd> attribute and is used for verilog netlist. Nodes
+  listed in this attribute value will be used as additional pin connections.
+  </p>
+  <p class="important">
+  the <kbd>extra</kbd> attribute is still used in verilog netlist as a list of attributes NOT to pass as
+  symbol parameters
+  </p>
+  <p>
+  You may assign the following attributes to an instance: <kbd>name=X1 VPWR=VCC VGND=GND subckt=NOR2_1</kbd>
+  and you want to have VCC and GND connections to the symbol in the Verilog netlist but do not want
+  any of these attributes to be
+  passed as symbol parameters. In this case you set: <kbd>verilog_extra="VPWR VGND"</kbd> and
+  <kbd>extra="VPWR VGND subckt"</kbd> since <kbd>subckt</kbd> is probably a spice attribute and you don't
+  want it in verilog.
+  </p>
+
+  <li><kbd>verilog_extra_dir</kbd></li>
+  <p>
+  This attribute allows to define the pin directions of <kbd>verilog_extra</kbd> symbol ports.
+  If unspecified the default is
+  <kbd>inout</kbd>. Allowed values are <kbd>input</kbd>, <kbd>output</kbd>, <kbd>inout</kbd>.<br>
+  Example:  <kbd>verilog_extra_dir="VPWR=input VGND=input"</kbd>
+  </p>
+
+  <li><kbd>verilogprefix</kbd></li>
+  <p>
+  If this attribute is defined in symbol it will be used as a prefix to the symbol name and subcircuit
+  expansion in verilog netlists.
   </p>
   <li><kbd>dir</kbd></li>
   <p> 
    Defines the direction of a symbol pin. Allowed values are <kbd>in</kbd>, <kbd>out</kbd>, <kbd>inout</kbd>.
   </p>
    <img src="symbol_property_syntax2.png">
+  <a id="pinnumber">
+  <li><kbd>pinnumber</kbd></li>
+  </a>
+  <p> 
+   For packaged devices (tEDAx netlists) : indicate the position of the pin on the package.
+   This can be overriden at instance level by attributes <kbd>pinnumber(name)</kbd> set in the instance
+   for tEDAx netlists.
+   <br><br>
+  <li><kbd>sim_pinnumber</kbd></li>
+   For VHDL, SPICE, Verilog netlists: define the ordering of symbol ports in netlist.
+   If all symbol pins have a sim_pinnumber attribute this symbol will be netlisted 
+   (in all netlist formats) with pins sorted in ascending order according to sim_pinnumber value.
+   Start value of sim_pinnumber does not matter (may start at 1 or 0) , it is used as the sort key.
+   You can assign the sim_pinnumber attribute directly in the symbol...
+  </p>
+  <img src="pinnumber1.png">
+  <p>
+  ... Or you can assign these in the schematic pins, if you use the "Make symbol from schematic"
+  function ('a' key) these attributes will be transferred to the symbol.<br>
+  The sim_pinnumber attributes that determine the netlist port ordering are those defined in the symbol.
+  </p>
+  <img src="pinnumber2.png">
+  <p>
+  For sorting to happen all symbol pins must have a sim_pinnumber attribute.
+  If some pins miss this attribute no sorting is done and pin ordering will be unchanged,
+  the stored order of symbol pins will be used (first created pin netlisted first).<br>
+  If there are duplicate sim_pinnumber attributes (but all pins have this attribute) sorting
+  will happen but relative ordering or pins with identical sim_pinnumber is undefined.<br>
+  As an example you may give sim_pinnumber=9999 on a symbol output and sim_pinnumber=1 on all other
+  pins if you only require the output pin to be netlisted at the end, and don't care about
+  the other pin ordering.
+  </p>
+
+
+
+
   <li><kbd>propag=n</kbd></li>
   <p>
   This attribute instructs xschem to do a 'propagate highlight' from the pin with this attribute to the
@@ -303,7 +438,7 @@ m5 net1 b net2 VSSPIN nlv w=wn l=ln geomod=0 m=1
   <p>
   This attribute is used in the xschem embedded digital simulation engine: propagate logic simulation
   to the output pins <kbd>n,[m,...]</kbd>. The logic function is defined via the 'function<kbd>n</kbd>'
-  global attribute. There is one 'funtion<kbd>n</kbd>' for each <kbd>n</kbd> output pin.
+  global attribute. There is one 'function<kbd>n</kbd>' for each <kbd>n</kbd> output pin.
   see 'function<kbd>n</kbd>' attribute for more info.
   </p>
    <img src="symbol_property_syntax4.png">
@@ -337,10 +472,16 @@ m5 net1 b net2 VSSPIN nlv w=wn l=ln geomod=0 m=1
      <li> <kbd>|</kbd>: Does a logical OR operation of the last 2 elements on top of the stack, the result is left on the stack</li>
      <li> <kbd>^</kbd>: Does a logical XOR operation of the last 2 elements on top of the stack, the result is left on the stack</li>
      <li> <kbd>~</kbd>: Does a logical Negation operation of the last element on top of the stack, the result is left on the stack</li>
+     <li> <kbd>M</kbd>: preceeded by 3 element 'a', 'b', 'm', return 'a' if 'm' == 0, 'b' if 'm'==1, else 'X' </li>
+     <li> <kbd>m</kbd>: same as above, but don't update if 'm' not 1 or 0. Used to avoid deadlocks.</li>
+     <li> <kbd>z</kbd>: preceeded by 2 elements, 'a', 'e', return 'a' if 'e' == 1 else Z (hi-Z)</li>
      <li> <kbd>d</kbd>: Duplicates top element on the stack</li>
-     <li> <kbd>x</kbd>: Exhanges the 2 top elements on the stack</li>
+     <li> <kbd>x</kbd>: Exchanges the 2 top elements on the stack</li>
+     <li> <kbd>r</kbd>: Rotate down: bottom element of stack goes to top</li>
      <li> <kbd>H</kbd>: Puts a Logic '1' on the stack</li>
      <li> <kbd>L</kbd>: Puts a Logic '0' on the stack</li>
+     <li> <kbd>Z</kbd>: Puts a Logic 'Z' on the stack</li>
+     <li> <kbd>U</kbd>: Puts a Logic 'U' on the stack (do not assign to node)</li>
    </ul>
   <p>
    The remaining value on the stack is the value that is returned and assigned to the output pin.
@@ -381,11 +522,58 @@ verilog_format="xnor #(@risedel , @falldel ) @name ( @@Z , @@A , @@B );"
    This attribute contains a SPICE .model or .subckt specification (<kbd>device_model=".model D1N4148 D ...."</kbd>)
    that will be printed at end of netlist only once for the specified component (D1N4148 in the example).
   </p>
+  <li><kbd>schematic</kbd></li>
+  <p>
+   This attribute specifies an alternate schematic file to open when descending into the subcircuit:
+  </p>
+   <pre class="code"> schematic=inv_2.sch</pre>
+  <p>
+   It is possible to call a TCL procedure to decide the schematic to descend into:
+  </p>
+   <pre class="code"> schematic="tcleval([hierarchy_config @symname])"</pre>
+  <p>
+   The above <kbd>schematic</kbd> attribute will be evaluated by a <kbd>hierarchy_config</kbd>
+   TCL procedure (which must be defined) and the @symname attribute will be expanded to the name of the
+   symbol before passing the argument to the TCL procedure.
+   This allows user defined schematic selection in the hierarchy to simulate the design at different 
+   details/abstraction levels.<br>
+   One suggested approach is to define for a given <kbd>opamp_65nm.sym</kbd> symbol several schematics like
+   <kbd>opamp_65nm.sch</kbd>, <kbd>opamp_65nm_pex.sch</kbd>, <kbd>opamp_65nm_aged.sch</kbd>, 
+   <kbd>opamp_65nm_empty.sch</kbd>, ... and define some user accessible method in hierarchy_config procedure
+   to select one of these 'switch' schematics.
+  </p>
+  <li><kbd>symbol_ignore</kbd></li>
+  <p>
+   This attribute can be attached to symbol elements, like lines, rectangles, polygons, arcs, texts, 
+   wires and instances (in case of lcc symbols). If set to true (<kbd>symbol_ignore=true</kbd>)
+   the corresponding element will not be displayed when the symbol is instantiated.
+  </p>
  </ul>
  <h3>PREDEFINED SYMBOL VALUES</h3>
  <ul>
+  <li><kbd>@name</kbd></li>
+  <p> This expands to the instance name of the symbol (like C1, R2, X3, ...)
+   It is replaced with the value of the <kbd>name=...</kbd> attribute given when placing an instance of the symbol
+   in a schematic.</p>
+  <li><kbd>#pattern#@name</kbd></li>
+  <p> This is a variation of the above where <kbd>pattern</kbd> is prefixed to all substituted <kbd>@name</kbd>
+   patterns. The difference with <kbd>pattern@name</kbd> is that in case of vector instances (this means
+   a placement of an instance with <kbd>name=R2[3:0]</kbd>, for example) the <kbd>pattern</kbd> string
+   is added to all single instances when expanding the name. see below examples.<br>
+   <kbd>pattern@name</kbd> where <kbd>name=R2[2:0]</kbd> is given in the instance placement,
+   expands to <kbd>patternR2[2],R2[1],R2[0]</kbd><br>
+   <kbd>#pattern#@name</kbd> where <kbd>name=R2[2:0]</kbd> is given in the instance placement,
+   expands to <kbd>patternR2[2],patternR2[1],patternR2[0]</kbd><br>
   <li><kbd>@symname</kbd></li>
   <p> This expands to the name of the symbol</p>
+  <li><kbd>@symref</kbd></li>
+  <p> This expands to the symbol reference exactly as specified in the instance (the <kbd>Symbol</kbd> textbox 
+   if you edit the symbol attributes with <kbd>q</kbd> key).</p>
+  <li><kbd>@symname_ext</kbd></li>
+  <p> This expands to the name of the symbol, keeping the extension (usually .sym)</p>
+  <li><kbd>@path</kbd></li>
+  <p> This expands to the hierarchy path the symbol instance is placed in
+      (example: <kbd>xcontrol.xdec[3].xinv</kbd>)</p>
   <li><kbd>@pinlist</kbd></li>
   <p> This expands to the list of nets that connect to symbol pins in
    the order they are set in the symbol</p>
@@ -393,7 +581,10 @@ verilog_format="xnor #(@risedel , @falldel ) @name ( @@Z , @@A , @@B );"
   <p> This expands to the net that connect to symbol pin named <kbd>pin</kbd>. This substitution
    takes place only when producing a netlist (Spice, Verilog, VHDL, tEDAx) so it is allowed to use this
    value only in <kbd>format</kbd>,<kbd>vhdl_format</kbd>, <kbd>tedax_format</kbd> or <kbd>verilog_format</kbd>
-   attributes (see <a href="netlisting.html">Netlisting slide)</a></p>
+   attributes (see <a href="netlisting.html">Netlisting slide)</a><br>
+   The @#pin attribute is expanded to <kbd>?m net</kbd> where <kbd>m</kbd> is the pin multiplicity and
+   <kbd>net</kbd> is the name of the net attached to the symbol <kbd>pin</kbd>. This information is needed 
+   by the xschem netlister.</p>
   <li><kbd>@#n</kbd></li>
   <p>
    This expands to the net that connect to symbol pin at position <kbd>n</kbd> in the XSCHEM internal storage. This substitution
@@ -402,6 +593,10 @@ verilog_format="xnor #(@risedel , @falldel ) @name ( @@Z , @@A , @@B );"
    attributes (see <a href="netlisting.html">Netlisting slide)</a><br>
    This method of accessing a net that connects to a pin is much faster than previous one since XSCHEM does not need to 
    loop through symbol pin names looking for a match.<br>
+   The @#n attribute is expanded to <kbd>?m net</kbd> where <kbd>m</kbd> is the <kbd>n-th</kbd> pin multiplicity and
+   <kbd>net</kbd> is the name of the net attached to the symbol <kbd>cwn-thpin</kbd> pin. This information is needed 
+   by the xschem netlister.</p>
+
    Example: <kbd>@#2</kbd>: return net name that connects to the third pin of the symbol (position 2).
   </p>
   <li><kbd>@#n:pin_attribute</kbd></li>
@@ -421,8 +616,66 @@ verilog_format="xnor #(@risedel , @falldel ) @name ( @@Z , @@A , @@B );"
     These tokens may be placed as text in the symbol graphic window, not in format strings.
   </p>
   <li><kbd>@#pin_name:net_name</kbd></li>
+
   <li><kbd>@#n:net_name</kbd></li>
-  <p> these expand to the net name attached to pin with name <kbd>pin_name</kbd> or with sequence number <kbd>n</kbd>. </p>
+  <p> these expand to the net name attached to pin with name <kbd>pin_name</kbd> or with
+    sequence number <kbd>n</kbd>. </p>
+
+  <li><kbd>@#pin_name:resolved_net</kbd></li>
+  <li><kbd>@#n:resolved_net</kbd></li>
+  <p> these expand to the full hierarchy name of the net attached to pin with name <kbd>pin_name</kbd> or with 
+    sequence number <kbd>n</kbd>. </p>
+
+  <li><kbd>@#pin_name:spice_get_voltage</kbd></li>
+  <li><kbd>@#n:spice_get_voltage</kbd></li>
+  <p> these expand to the voltage of the net attached to the pin with name <kbd>pin_name</kbd> or with
+    sequence number <kbd>n</kbd>, extracted from simulation raw file (operating point or 
+    cursor <kbd>b</kbd> position)</p>
+
+  <li><kbd>@spice_get_voltage</kbd></li>
+  <p> This attribute will be replaced by the voltage of the net attached to the first pin (pin number 0) 
+    of the symbol </p>
+
+  <li><kbd>@spice_get_current</kbd></li>
+  <p> This attribute will be replaced by the current through the first pin of the primitive symbol
+    according to the SPICE syntax. This can be used for elementary devices like voltage sources,
+    resistors, mosfets, bjts and so on. For example <kbd>@spice_get_current</kbd> will display the 
+    drain current of a mosfet if this attribute is placed inside a MOS symbol.</p>
+
+  <li><kbd>@spice_get_current_param</kbd></li>
+  <p> This will specify in <kbd>param</kbd> the current to display, for example: <br>
+    <kbd>@spice_get_current_ibs</kbd> to get the body-source current in a Mosfet,
+    <kbd>@spice_get_current_ie</kbd> to get the emitter current in a Bjt.</p>
+
+  <li><kbd>@spice_get_modelvoltage_param</kbd></li>
+  <p> This will specify in <kbd>param</kbd> the voltage to display, for example: <br>
+    <kbd>@spice_get_modelvoltage_vth</kbd> to get the Vth in a Mosfet</p>
+
+  <li><kbd>@spice_get_modelparam_param</kbd></li>
+  <p> This will specify in <kbd>param</kbd> the model parameter to display, for example: <br>
+    <kbd>@spice_get_modelparam_gm</kbd> to get the transconductance in a Mosfet</p>
+
+  <li><kbd>@spice_get_node spice_node </kbd></li>
+  <p>
+   <kbd>spice_node</kbd> Will be replaced with the Spice simulated value for that node.<br>
+   Examples:<br>
+     <kbd>Id=@spice_get_node i(\@m.@path@spiceprefix@name\.msky130_fd_pr__@model\[id])</kbd><br>
+       will translate to: <br>
+     <kbd>Id=6.6177u</kbd><br>
+   and:<br>
+     <kbd>Id=@spice_get_node i(\@m.@path@spiceprefix@name\.msky130_fd_pr__@model\[id]) A</kbd><br>
+       will translate to: <br>
+     <kbd>Id=6.6177uA</kbd><br>
+   note the required separator spaces around the spice node. Spaces are used here as
+   separators since spice nodes don't allow spaces.
+   escapes are used for 2 reasons:
+   mark a @ as a literal character instead of a the start of a @var token to be substituted
+   mark the end of a @var, like for example @var\iable. In this case @var will
+   be substituted by xschem instead of @variable.<br>
+   Caveats: only one @spice_get_node is allowed in a string for now.
+  </p>
+
+
   <li><kbd>@sch_last_modified</kbd></li>
   <p>
    this indicates the last modification time of the <kbd>.sch</kbd> file of the symbol.
@@ -436,28 +689,48 @@ verilog_format="xnor #(@risedel , @falldel ) @name ( @@Z , @@A , @@B );"
    this indicates the last modification time of the schematic (.sch)  <b>containing</b>
    the symbol instance.
   </p>
+  <li><kbd>@schname_ext</kbd></li>
+  <p>
+   this expands to the name of the schematic (.sch) <b>containing</b>
+   the symbol instance.
+  </p>
   <li><kbd>@schname</kbd></li>
   <p>
-   this expands to the name of the schematic (.sch)  <b>containing</b>
+   this expands to the name of the schematic <b>containing</b>
+   the symbol instance, without the extension (no .sch).
+  </p>
+  <li><kbd>@topschname</kbd></li>
+  <p>
+   this expands to the name of the tol level schematic (.sch)  <b>containing</b>
    the symbol instance.
   </p>
   <li><kbd>@prop_ptr</kbd></li>
   <p>
-   this expandes to the <b>entire</b> property string passed to the component.
+   this expands to the <b>entire</b> property string passed to the component.
   </p>
   <li><kbd>@schprop</kbd></li>
   <p>
-   this expandes to the <b>spice</b> global property string of the schematic containing the symbol
+   this expands to the <b>spice</b> global property string of the schematic containing the symbol
   </p>
   <li><kbd>@schvhdlprop</kbd></li>
   <p>
-   this expandes to the <b>VHDL</b> global property string of the schematic containing the symbol
+   this expands to the <b>VHDL</b> global property string of the schematic containing the symbol
   </p>
   <li><kbd>@schverilogprop</kbd></li>
   <p>
-   this expandes to the <b>Verilog</b> global property string of the schematic containing the symbol
+   this expands to the <b>Verilog</b> global property string of the schematic containing the symbol
   </p>
  </ul><br>
+ <h3>TCL ATTRIBUTE SUBSTITUTION</h3>
+
+  <p>
+   Any attribute and symbol text can be embedded in a <kbd>tcleval(....)</kbd> construct, the string inside the 
+   parentheses will be passed to the tcl interpreter for evaluation. This allows to use any tcl 
+   variable/command/expression. Example: <br>
+   <kbd>spice_ignore="tcleval($::ignore_symbol)"</kbd> <br>
+   will cause the symbol to be ignored by the spice netlister if the <kbd>ignore_symbol</kbd> tcl variable is 
+   existing and set to <kbd>true</kbd>
+  </p>
 
  <!-- end of slide -->
  <div class="filler"></div>

@@ -1,4 +1,24 @@
-v {xschem version=2.9.9 file_version=1.2 }
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
 K {}
 V {}
@@ -18,7 +38,6 @@ N 480 -350 520 -350 {lab=B}
 N 930 -440 970 -440 {lab=OUTPUT_Y}
 N 310 -440 380 -440 {lab=INPUT_F}
 N 310 -480 380 -480 {lab=INPUT_E}
-N 480 -460 520 -460 {lab=A}
 N 550 -190 670 -190 {lab=VCCFILT}
 N 590 -130 590 -110 {lab=ANALOG_GND}
 N 790 -190 940 -190 {lab=VCC5}
@@ -30,16 +49,20 @@ N 520 -460 760 -460 {lab=A}
 N 580 -420 760 -420 {lab=B}
 N 580 -420 580 -350 {lab=B}
 N 520 -350 580 -350 {lab=B}
+N 480 -460 520 -460 {
+lab=A}
 C {title.sym} 160 -30 0 0 {name=l2 author="Stefan"}
 C {74ls00.sym} 420 -350 0 0 {name=U1:2  risedel=100 falldel=200}
 C {74ls00.sym} 870 -440 0 0 {name=U1:1  risedel=100 falldel=200}
 C {lab_pin.sym} 970 -440 0 1 {name=p0 lab=OUTPUT_Y}
-C {capa.sym} 590 -160 0 0 {name=C0 m=1 value=100u device="electrolitic capacitor"}
 C {74ls00.sym} 420 -460 0 0 {name=U1:4 risedel=100 falldel=200
-url="http://www.engrcs.com/components/74LS00.pdf" 
-power=VCC5 
+url="http://www.engrcs.com/components/74LS00.pdf"
 
-___net:14=VCC5
+#="you can reroute implicit power pins in the following two ways:"
+power=VCC5 
+__net:14=VCC5
+
+#="You can reassign pin attrinutes this way:"
 ___pinnumber(B)=111:222:333:444}
 C {7805.sym} 730 -190 0 0 {name=U0 
 spiceprefix=X
@@ -91,3 +114,4 @@ C {lab_pin.sym} 40 -370 0 1 {name=l4 lab=INPUT_A verilog_type=reg}
 C {lab_pin.sym} 40 -350 0 1 {name=l5 lab=INPUT_B verilog_type=reg}
 C {lab_pin.sym} 40 -410 0 1 {name=l6 lab=INPUT_E verilog_type=reg}
 C {lab_pin.sym} 40 -390 0 1 {name=l7 lab=INPUT_F verilog_type=reg}
+C {capa.sym} 590 -160 0 0 {name=C0 m=1 value=100u device="electrolitic capacitor"}

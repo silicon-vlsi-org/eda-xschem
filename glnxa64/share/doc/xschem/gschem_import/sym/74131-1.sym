@@ -1,11 +1,6 @@
-v {xschem version=2.9.7 file_version=1.1}
-G {type=74131
-template="device=74131
-footprint=DIP16
-name=U?
-description=\\"3 to 8 decoder/demultiplexer with register\\"
-numslots=0
-Vcc=Vcc
+v {xschem version=3.0.0 file_version=1.2}
+K {type=74131
+template="device=74131 footprint=DIP16 name=U? description=\\"3 to 8 decoder/demultiplexer with register\\" numslots=0 Vcc=Vcc
 GND=GND
 "
 tedax_format="footprint @name @footprint
@@ -17,6 +12,7 @@ format="@name @pinlist @value @Vcc @GND"
 extra="Vcc GND"
 extra_pinnumber="16 8"
 }
+G {}
 V {}
 S {}
 E {}
@@ -145,7 +141,7 @@ L 3 0 -20 30 -20 {}
 B 5 -2.5 -22.5 2.5 -17.5 {pinnumber=4
 pinseq=13
 name=CLK
-dir=inout
+dir=in
 }
 T {@#12:pinnumber} 20 -25 2 0 0.266667 0.266667 {layer=13}
 T {@#12:name} 37.5 -20 2 1 0.266667 0.266667 {}

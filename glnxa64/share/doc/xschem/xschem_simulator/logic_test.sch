@@ -1,4 +1,24 @@
-v {xschem version=2.9.9 file_version=1.2 }
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
 K {}
 V {}
@@ -11,7 +31,7 @@ T {This example shows Xschem (very simple) simulation abilities
 Ctrl-Click here to start a simulation.
 Xschem will be only partially responsive during simulation.
 Simulation will terminate automatically after 30 iterations
-Otherwise go to Simulation ->Forced stop tcl scripts} 1340 -740 0 0 2 2 {}
+Otherwise press Escape key.} 1340 -740 0 0 2 2 {}
 T {Clicking an input net and pressing '0', '1', '2' or '3' will set the net to logic state 0,1,X,Z respectively} 960 -1030 0 0 2 2 {}
 T {9 Flip Flop Linear Feedback Shift Register} 1980 -3440 0 0 3 3 {}
 T {Cyan: Uninitialized or unknown (X)} 4930 -540 0 0 1.5 1.5 {layer=1}
@@ -525,7 +545,7 @@ descr="START SIMULATION"
 comment="
   This launcher Starts a simple interactive simulation of the LFSR
 "
-tclcommand="  set tclstop 0  ;# clear stop flag
+tclcommand="
   set count 0
   xschem select instance l23 ;# VSS
   xschem select instance p11 ;# CLEAR
@@ -539,14 +559,13 @@ tclcommand="  set tclstop 0  ;# clear stop flag
   xschem select instance p11 clear ;# release CLEAR
   xschem select instance p8
   update ;# allow event loop to come in (update screen, user input etc) 
-  after 1000
   set logic_value 0
   while \{1\} \{
     update ;# allow event loop to come in (update screen, user input etc) 
     incr count
-    after 500
     if \{$count==30 || $tclstop == 1\} break
     xschem logic_set $logic_value
+    after 500
     set logic_value [expr !$logic_value]
   \}
 "

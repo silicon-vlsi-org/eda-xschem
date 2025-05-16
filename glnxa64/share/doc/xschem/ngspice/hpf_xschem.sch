@@ -1,8 +1,48 @@
-v {xschem version=2.9.5_RC5 file_version=1.1}
+v {xschem version=3.4.4 file_version=1.2
+*
+* This file is part of XSCHEM,
+* a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit
+* simulation.
+* Copyright (C) 1998-2024 Stefan Frederik Schippers
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+}
 G {}
+K {}
 V {}
 S {}
 E {}
+B 2 970 -610 1960 -220 {flags=graph
+y1=-93
+y2=1.3
+ypos1=0
+ypos2=2
+divy=5
+subdivy=1
+unity=1
+x1=-1.00075
+x2=7.45087
+divx=10
+subdivx=8
+node="\\"out db20()\\""
+color=4
+dataset=-1
+unitx=1
+logx=1
+logy=0
+}
 N 100 -550 100 -520 {lab=IN}
 N 650 -510 670 -510 {lab=OUT}
 N 270 -550 430 -550 {lab=PLUS}
@@ -20,6 +60,7 @@ N 800 -530 850 -530 {lab=0}
 N 100 -550 130 -550 {lab=IN}
 C {code_shown.sym} 20 -320 0 0 {name=CONTROL vhdl_ignore=true place=end value=".control
   listing e
+  save all
   run
   write hpf.raw
   let response = db(v(out)/v(in))
@@ -28,7 +69,7 @@ C {code_shown.sym} 20 -320 0 0 {name=CONTROL vhdl_ignore=true place=end value=".
   gnuplot hpf response xlog
 .endc
 "}
-C {code_shown.sym} 280 -310 0 0 {name=DIRECTIVES vhdl_ignore=true place=end value=".ac oct 100 0.1 1k 
+C {code_shown.sym} 390 -310 0 0 {name=DIRECTIVES vhdl_ignore=true place=end value=".ac oct 100 0.1 100meg
 .param pi   = 3.1415926
 .param Q    = 1
 .param freq = 20 
@@ -150,3 +191,9 @@ C {gnd.sym} 850 -460 0 0 {name=l3 lab=VEE}
 C {vdd.sym} 850 -600 0 0 {name=l4 lab=VCC}
 C {gnd.sym} 800 -530 0 0 {name=l6 lab=0}
 C {opin.sym} 670 -510 0 0 {name=p9 lab=OUT}
+C {launcher.sym} 1115 -175 0 0 {name=h5 
+descr="load ngspice waves" 
+tclcommand="
+xschem raw_read $netlist_dir/hpf.raw ac
+"
+}

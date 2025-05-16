@@ -5,7 +5,7 @@
 #  This file is part of XSCHEM,
 #  a schematic capture and Spice/Vhdl/Verilog netlisting tool for circuit 
 #  simulation.
-#  Copyright (C) 1998-2020 Stefan Frederik Schippers
+#  Copyright (C) 1998-2024 Stefan Frederik Schippers
 # 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,14 +39,28 @@ BEGIN{
  # topcell=toupper(ARGV[2])
  # ARGC=2
  first_subckt = 1
+ global["0"] = 1 # 0 is always a global reference node
  pathsep="_"
  nodes["M"]=4; nodes["R"]=2; nodes["D"]=2; nodes["V"]=2
  nodes["I"]=2; nodes["C"]=2; nodes["L"]=2; nodes["Q"]=3
  nodes["E"]=4; nodes["G"]=4; nodes["H"]=2; nodes["F"]=2
+ nodes["B"]=2; nodes["S"]=4
+ controlblock = 0
 }
-
 {
- if( ($0 !~/^\.include/) && ($0 !~/^\.INCLUDE/) ) $0=toupper($0)
+ if(toupper($0) ~ /^[ \t]*\.CONTROL/) controlblock = 1
+ if(controlblock == 0 && toupper($0) !~/^(\.INCLUDE|\.LIB|\.WRITE| *WRITE)/) $0=toupper($0)
+ if(toupper($0) ~ /^[ \t]*\.ENDC/) controlblock = 0
+ # allow to specify *.nodes[W]=2 or *.nodes["W"] = 2 metadata in the netlist for additional
+ # custom devices nodes specification.
+ if($0 ~/^[ \t]*\*\.[ \t]*NODES\["?[^]["]"?\][ \t]*=[ \t]*.*/) {
+   n_nodes = $0
+   sub(/^.*=[ \t]*/, "", n_nodes)
+   n_initial = $0
+   sub(/"?\].*/, "", n_initial)
+   sub(/^.*\["?/, "", n_initial)
+   nodes[n_initial] = n_nodes
+ }
  if($0 ~ /^\**\.SUBCKT/ && first_subckt) {
    topcell=$2
    sub(/^\*\*/,"",$0)
@@ -59,13 +73,23 @@ BEGIN{
  {
   a[lines-1]=a[lines-1] " " substr($0,2); next
  }
+
+ gsub(/[\t ]*=[\t ]*/, "=")
  a[lines++]=$0
 } 
 
 END{
+
+ for(j=0;j<lines;j++) a[j] = trim_quoted_spaces(a[j])
+ devpattern = "^["
+ for(j in nodes) {
+   devpattern = devpattern j
+ }
+ devpattern = devpattern "]"
  for(j=0;j<lines;j++) 
  {
   $0=a[j]
+
   if($1 ~ /\.GLOBAL/)			# get global nodes
    for(i=2;i<=NF;i++) global[$i]=i;
   if($1 ~ /^\.SUBCKT/)			# parse subckts
@@ -120,10 +144,14 @@ function expand(name, path, param,ports,   		# func. params
   paramarray2[parameter[1]]=parameter[2]
  }
  split(ports,portarray)
+ controlblock = 0
  for(j=subckt[name , "first"]+1;j<subckt[name , "last"];j++)
  {
+  if(a[j] ~ /^[ \t]*\.control/) controlblock = 1
   num=split(a[j],line)
-  if(line[1] ~ /^X/ )
+  if(controlblock) {
+    print a[j]
+  } else if(line[1] ~ /^X/ )
   {
    paramlist = ""; portlist = ""; subname=""
    for(k=num;k>=2;k--)
@@ -156,18 +184,23 @@ function expand(name, path, param,ports,   		# func. params
   }
   else
   {
-   if(line[1] ~ /^[EGHFCMDQRGIV]/)
+   if(line[1] ~ devpattern)
    {
+    nn = nodes[substr(line[1],1,1)]
+    if(a[j] ~ /^[GE].*(VALUE|CUR|VOL)=/) nn = 2 # behavioral VCVS/VCCS have 2 nodes only
     printf "%s ",line[1] pathname
-    for(k=2;k<=nodes[substr(line[1],1,1)]+1;k++)
+    for(k = 2; k <= nn + 1; k++)
      printf "%s ", getnode(name,pathnode,portarray,line[k])
     for(; k<=num;k++)
     {
-     if(line[1] ~ /[FH]/ && k==4)  printf "%s ", line[k] pathname
-     else if(line[k] ~/.*VALUE=.*/)
-       printf "%s ",general_sub(line[k],name,pathnode,portarray)
-     else if(line[k] ~/=/)
-     {
+     if(line[1] ~ /^[FH]/ && k==4)  printf "%s ", line[k] pathname
+     else if(line[k] ~ /^(VALUE|VOL|CUR|R|C|L|V|I)=/) {
+       # expressions contain spaces, but usually end the line. Concatenate all fields into line[k]
+       for(m = k + 1; m <= num; m++) line[k] = line[k] " " line[m]
+       printf "%s ",general_sub(subst_param(line[k], paramarray2),name,pathnode,portarray)
+       break
+     }
+     else if(line[k] ~/=/) {
       split(line[k],parameter,"=")
       if(parameter[2] in paramarray2)
        printf "%s ", parameter[1] "=" paramarray2[parameter[2]]
@@ -175,17 +208,48 @@ function expand(name, path, param,ports,   		# func. params
        printf "%s ",parameter[1] "=" subckt[name,"param",parameter[2]]
       else printf "%s ",line[k]
      }
-     else  printf "%s ", line[k]
+     else { # if parameter get actual value
+       if(line[k] in paramarray2) line[k] = paramarray2[line[k]]
+       else { # try to see if parameter inside quotes or braces 
+         m = line[k]
+         gsub(/[{}']/, "", m)
+         if(m in paramarray2) line[k] = paramarray2[m]
+       }
+       printf "%s ", line[k]
+     }
     }
    } 
-   else
-    printf "%s ", a[j]
+   else if(line[1] ~/^\.(SAVE|PRINT|PROBE)/) {
+     printf "%s ", general_sub(a[j],name,pathnode,portarray)
+   }
+   else {
+     printf "%s ", a[j]
+   }
    printf "\n"
   }
+  if(a[j] ~ /^[ \t]*\.endc/) controlblock = 0
  }
 }
 
-
+function subst_param(s, pa,     p, i, ss)
+{
+  for(p in pa) {
+    while(1) {
+      i = match(s, "[^a-zA-Z0-9_]" p "[^=a-zA-Z0-9_]") 
+      ss = ""
+      if(i) {
+        ss = ss substr(s, 1, RSTART)
+        ss = ss pa[p]
+        ss = ss substr(s, RSTART + RLENGTH - 1)
+        s = ss
+      }
+      if(!i) {
+        break
+      }
+    }
+  }
+  return s
+}
 
 
 
@@ -194,6 +258,8 @@ function getnode(name, path, portarray, node)
 # return the full path-name of <node> in subckt <name> 
 # in path <path>, called with ports <portarray>
 {
+ sub(/ *$/, "", node)
+ sub(/^ */, "", node)
  if(name!=topcell)  		# if we are in top cell, nothing to do
  {
   if(name SUBSEP "port" SUBSEP node in subckt)
@@ -205,17 +271,42 @@ function getnode(name, path, portarray, node)
 }
 
 
-# expand expressions like: VALUE=3*V(IN)+VA)
+# expand expressions like: VALUE=3*V(IN)+VA) or I={V(nn,mm) *1e-6}
 # substituting node names
-function general_sub(string,name,pathnode,portarray,       nod,sss)
+function general_sub(string,name,pathnode,portarray,       nod, sss, state, lastc)
 {
- while(match(string, /V\([^\(\)]*\)/ ))
- {
-  nod = substr(string,RSTART+2,RLENGTH-3)
-  sss=sss substr(string,1,RSTART-1) "V(" \
-   getnode(name,pathnode,portarray,nod) ")"
-  string=substr(string,RSTART+RLENGTH)
+ state = 0
+ while(1) {
+   # print "****** " string
+   if(state == 0 && match(string, /V\([^(),]*[,)]/)) { # match V(XXX) or V(XXX,
+     # print "***** here0"
+     lastc = substr(string, RSTART+RLENGTH-1, 1)
+     if(lastc == ",") state =1
+     nod = substr(string,RSTART+2,RLENGTH-3)
+     sss=sss substr(string,1,RSTART-1) "V(" getnode(name,pathnode,portarray,nod) lastc
+     string=substr(string,RSTART+RLENGTH)
+   } else if(state == 1 && match(string, /[^(),]*[)]/)) { # match YYY) only if state==1
+     # print "***** here1"
+     nod = substr(string,RSTART,RLENGTH-1)
+     sss=sss substr(string,1,RSTART-1) getnode(name,pathnode,portarray,nod) ")"
+     string=substr(string,RSTART+RLENGTH)
+     state = 0
+   } else break
  }
  sss=sss string
  return sss
-}                                      
+}
+
+function trim_quoted_spaces(s,                p, m)
+{
+  p = ""
+  while(match(s, /['{][^}']*['}]/)) {
+    m = substr(s, RSTART, RLENGTH)
+    gsub(/ /, "", m)
+    p = p substr(s, 1, RSTART -1) m
+    s = substr(s, RSTART + RLENGTH)
+  }
+  p = p s
+  return p
+}
+
