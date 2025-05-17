@@ -26,7 +26,7 @@ export PATH=$PATH:$XSCHEM_HOME/bin
 
 
 ## Quick Start Guide
-- User Manual/Tutorials: [ [PDF](doc/XSCHEM_2.9.2_Manual_Tutorials.pdf) | [HTML](glnxa64/share/doc/xschem/index.html) | [MAN(glnxa64/share/man/man1/xschem.1)
+- User Manual/Tutorials: [ [PDF](doc/XSCHEM_2.9.2_Manual_Tutorials.pdf) | [HTML](glnxa64/share/doc/xschem/index.html) | [MAN](glnxa64/share/man/man1/xschem.1)]
 - [Analog simulation with xschem and the skywater 130nm Process Development Kit (PDK)](https://www.youtube.com/watch?v=bYbkz8FXnsQ): YouTube tutorial by Stephan
 - Create a file `xschemrc` in the work directory (say `~/work/xschem`) with the following `tcl` initilizations:
 
