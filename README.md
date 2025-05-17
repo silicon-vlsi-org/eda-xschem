@@ -20,7 +20,7 @@ Precompiled for **64b 24.04 Ubuntu and Ubuntu-based Linux**. It's tested on a Ub
 
 export XSCHEM_HOME=$HOME/eda-bins/xschem-3-4-8
 export XSCHEM_SHAREDIR=$XSCHEM_HOME/share/xschem
-export  PATH=$PATH:$XSCHEM_HOME/bin
+export PATH=$PATH:$XSCHEM_HOME/bin
 
 ```
 
@@ -47,6 +47,16 @@ source $PDK_ROOT/$PDK/libs.tech/xschem/xschemrc
 set ngbehavior=hsa
 set ng_nomodcheck
 ```
+
+## Release History
+
+- **v3.4.8.0**
+  - *xschem v3.4.8*  on 05/16/2025
+  - Compiled for **Ubuntu 24.04**
+  - This version is minimum requirement for SKY130 PDK integration
+- **v2.9.9.0**
+  - *xschem v2.9.9*  on 06/17/2021
+  - Compiled for **Ubuntu 18.04**
 
 
 * * *
