@@ -18,7 +18,7 @@ Precompiled for **64b 24.04 Ubuntu and Ubuntu-based Linux**. It's tested on a Ub
 
 ```bash
 
-export XSCHEM_HOME=$HOME/eda-bins/xschem-3-4-8
+export XSCHEM_HOME=$HOME/cad/xschem
 export XSCHEM_SHAREDIR=$XSCHEM_HOME/share/xschem
 export PATH=$PATH:$XSCHEM_HOME/bin
 
