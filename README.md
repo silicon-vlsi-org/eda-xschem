@@ -36,6 +36,7 @@ set PDK "sky130A"
 append XSCHEM_LIBRARY_PATH ":${PDK_ROOT}/${PDK}/libs.tech/xschem"
 source $PDK_ROOT/$PDK/libs.tech/xschem/xschemrc
 ```
+**NOTE** The above content is in the file `xschemrc` in this repo 
 
 - Start `xschem` from the work directory
 - xschem should start with a SKY130 schematic with the lots of examples and working schematic.
@@ -44,10 +45,11 @@ source $PDK_ROOT/$PDK/libs.tech/xschem/xschemrc
 - The netlist is created in the default driectory `~/.xschem/simulations`
 - If you are using the SKY130 PDK, create `~/.xschem/simulations/.spiceinit` with the following content to speed up the simulation:
 
-```bash
+```tcl
 set ngbehavior=hsa
 set ng_nomodcheck
 ```
+**NOTE** The above content is in the file `spicinit` in this repo
 
 ## Release History
 
