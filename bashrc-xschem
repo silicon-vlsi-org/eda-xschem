@@ -1,0 +1,4 @@
+## This needs to sourced in ~/.bashrc
+export XSCHEM_HOME=$HOME/cad/eda-xschem/glnxa64
+export XSCHEM_SHAREDIR=$XSCHEM_HOME/share/xschem
+export PATH=$PATH:$XSCHEM_HOME/bin
